@@ -71,8 +71,9 @@ var Main = (function () {
 
       try{
         let data = await modules[name].methods.getData()
-        // modules[name].data = data;
-        console.log('data', data)
+        modules[name].data = data;
+        console.log('data', modules)
+        insertModuleData();
       }
       catch(e){
         console.error(e);
@@ -81,13 +82,18 @@ var Main = (function () {
     }
   }
 
+  const insertModuleData = function(){
+    console.log(modules.weather.data)
+    modules.weather.methods.createDom(modules.weather.data)
+  }
+
   return {
     init: function () {
       loadConfig()
-      loadModules()
+      
     },
     createModules: function () {
-      modules.weather.methods.createDom()
+      loadModules()
     },
   }
 })()

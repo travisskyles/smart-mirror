@@ -1,8 +1,5 @@
 'use strict'
 
-// const superagent = require('superagent');
-// const globalConfig = require('../../config/config');
-
 var weather = (function () {
   const defaults = {
     location: {
@@ -18,7 +15,7 @@ var weather = (function () {
   const data = Object.assign({}, defaults, config.modules[0].config)
   console.log(data)
 
-  const setLocation = function () {
+  const setLocation =function () {
     getLocation(function (lat, lon) {
       const geo = {
         location: {
@@ -26,13 +23,10 @@ var weather = (function () {
           lon: lon,
         },
       }
-
       Object.assign(data, geo)
 
       console.log(data.location.lat)
-      // data.location.lat = lat;
-      console.log(data.location.lat)
-      // data.location.lon = lon;
+      console.log(data.location.lon)
       getWeather()
     })
   }
@@ -75,11 +69,11 @@ var weather = (function () {
 
         console.log(weatherObj);
         return weatherObj;
-        
       })
   }
 
-  const createDomObjects = function () {
+  const createDomObjects = function(weatherData){
+    console.log(weatherData)
     const moduleLocation = document.getElementsByClassName('container weather_module')
 
     const wrapper = document.createElement('div')
@@ -89,14 +83,15 @@ var weather = (function () {
     moduleLocation[0].appendChild(wrapper)
     wrapper.append(leftWrapper, rightWrapper)
 
-    // const icon = document.createElement('i');
-    // console.log(icon);
-    // icon.classList.add(`wi wi-owm-${obj.icon}`);
-    // leftWrapper.appendChild(icon);
+    const icon = document.createElement('i');
+    icon.classList.add('wi', `wi-owm-${weatherData.icon}`);
+    console.log(icon);
+    leftWrapper.appendChild(icon);
 
     const tempWrapper = document.createElement('div')
     const temp = document.createElement('span')
     temp.id = 'weather_temp'
+    temp.innerHTML = weatherData.temp;
     const degree = document.createElement('span')
     degree.innerHTML = '&#176;'
     const unit = document.createElement('span')
@@ -118,6 +113,7 @@ var weather = (function () {
     const feelsText = document.createElement('span')
     feelsText.innerHTML = 'Feels like '
     const feelsTemp = document.createElement('span')
+    feelsTemp.innerHTML = weatherData.feels_like;
     feelsTemp.id = 'weather_feelsTemp'
     const feelsDeg = document.createElement('span')
     feelsDeg.innerHTML = '&#176;'
@@ -144,12 +140,13 @@ var weather = (function () {
   }
 
   return {
-    getData: function () {
-      validateData()
+    getData: async function () {
+      // return await validateData()
+      return await getWeather();
     },
 
-    createDom: function () {
-      createDomObjects()
+    createDom: function (data) {
+      createDomObjects(data)
     },
   }
 })()
