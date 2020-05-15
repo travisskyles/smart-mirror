@@ -1,6 +1,4 @@
-// require('dotenv').config();
-
-var config = {
+var sample_config = {
   modules: [
     {
       name: 'weather',
@@ -15,7 +13,7 @@ var config = {
         },
         type: 'current', // current, forecast
         units: 'imperial', //imperial, metric
-        appid: '2dc15ae20faf5befed635b49ac81fc15',
+        appid: 'sample_',
       },
     },
   ],
