@@ -2,6 +2,9 @@
 
 const Server = require('./server.js');
 const fs = require('fs');
+const path = require('path');
+
+global.root_path = path.resolve(__dirname + '/../');
 
 class App {
 
@@ -13,12 +16,11 @@ class App {
    */
   _loadConfig(){
     console.log('Loading configuration file...');
-    const defaultsFile = require('../config/defaults.js');
+    const defaultsFile = require(__dirname + '/../config/defaults.js');
 
     try{
-      console.log('here');
-      fs.existsSync('../config/config.js', fs.F_OK)
-      const configFile = require('../config/config.js');
+      fs.existsSync(__dirname + '../config/config.js', fs.F_OK)
+      const configFile = require(__dirname + '/../config/config.js');
       const config = Object.assign(defaultsFile, configFile);
       return config;
     }

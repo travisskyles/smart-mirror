@@ -8,7 +8,8 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "jsdoc": "^3.6.4",
-    "open": "^7.0.4"
+    "open": "^7.0.4",
+    "path": "^0.12.7"
   },
   "devDependencies": {},
   "scripts": {
