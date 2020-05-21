@@ -12,143 +12,221 @@ var weather = (function () {
     appid: '',
   }
 
-  const data = Object.assign({}, defaults, config.modules[0].config)
-  console.log(data)
+  const moduleData = Object.assign({}, defaults, config.modules[0].config)
 
-  const setLocation =function () {
-    getLocation(function (lat, lon) {
-      const geo = {
-        location: {
-          lat: lat,
-          lon: lon,
-        },
-      }
-      Object.assign(data, geo)
+  const getPlace = function(){
+    let place = `${moduleData.location.city},`;
+    (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
+    place += moduleData.location.country;
 
-      console.log(data.location.lat)
-      console.log(data.location.lon)
-      getWeather()
-    })
+    return place;
   }
 
-  const validateData = function () {
-    if (!data.location.lat || !data.location.lon) {
-      setLocation()
-    } else {
-      getWeather()
-    }
-  }
+  const getWeatherCurrent = async function (){
 
-  const getWeather = async function () {
-    let weatherObj = {}
+    let place = getPlace();
 
-    let exclude
-
-    switch (data.type) {
-      case 'current':
-        exclude = 'minutely,hourly,daily'
-        break
-      case 'forecast':
-        exclude = 'current,minutely,hourly'
-        break
-    }
-    console.log(exclude)
-
-    return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.location.lat}&lon=${data.location.lon}&exclude=${exclude}&appid=${data.appid}&units=${data.units}`)
+    return fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=${moduleData.appid}`)
       .then(response => response.json())
       .then(results => {
-        console.log(results)
-        if (data.type === 'current') {
-          weatherObj = {
-            time: moment(results.dt).format('LT'),
-            icon: results.current.weather[0].id,
-            temp: results.current.temp,
-            feels_like: results.current.feels_like,
-          }
+        console.log('results',results)
+
+        const weatherObj = {
+          time: moment.unix(results.dt).format('LT'),
+          location: results.name,
+          icon: results.weather[0].id,
+          description: results.weather[0].description,
+          temp: {
+            current: Math.round(kelvinToFahr(results.main.temp)),
+            high: Math.round(kelvinToFahr(results.main.temp_max)),
+            low: Math.round(kelvinToFahr(results.main.temp_min)),
+            feels_like: Math.round(kelvinToFahr(results.main.feels_like)),
+          },
+          wind: {
+            speed: results.wind.speed,
+            direction: (results.wind.deg)? degToCompass(results.wind.deg) : 'N/A',
+          },
+          humidity: results.main.humidity,
         }
 
-        console.log(weatherObj);
         return weatherObj;
       })
   }
 
-  const createDomObjects = function(weatherData){
-    console.log(weatherData)
+  const createDomCurrent = function(weatherData, configData){
+
     const moduleLocation = document.getElementsByClassName('container weather_module')
 
     const wrapper = document.createElement('div')
+      wrapper.id = 'weather_wrapper';
     const leftWrapper = document.createElement('div')
+      leftWrapper.id = 'weather_leftWrapper';
     const rightWrapper = document.createElement('div')
-    console.log(moduleLocation)
+      rightWrapper.id = 'weather_rightWrapper';
+
     moduleLocation[0].appendChild(wrapper)
     wrapper.append(leftWrapper, rightWrapper)
 
+    // left wrapper
     const icon = document.createElement('i');
-    icon.classList.add('wi', `wi-owm-${weatherData.icon}`);
-    console.log(icon);
-    leftWrapper.appendChild(icon);
+      icon.classList.add('wi', `wi-owm-${weatherData.icon}`);
+      icon.id = 'weather_icon';
+      leftWrapper.appendChild(icon);
 
+    // temp
     const tempWrapper = document.createElement('div')
+      tempWrapper.id = 'weather_tempWrapper';
+
     const temp = document.createElement('span')
-    temp.id = 'weather_temp'
-    temp.innerHTML = weatherData.temp;
-    const degree = document.createElement('span')
-    degree.innerHTML = '&#176;'
-    const unit = document.createElement('span')
-    switch (data.units) {
-      case '':
-        unit.innerHTML = 'K'
-        break
-      case 'imperial':
-        unit.innerHTML = 'F'
-        break
-      case 'metric':
-        unit.innerHTML = 'C'
-        break
-    }
-    tempWrapper.append(temp, degree, unit)
+      temp.id = 'weather_temp'
+      temp.innerHTML = weatherData.temp.current + '&#176;';
+    const tempUnit = document.createElement('span')
+      tempUnit.id = 'weather_unit';
+      switch (configData.units) {
+        case '':
+          tempUnit.innerHTML = 'K'
+          break
+        case 'imperial':
+          tempUnit.innerHTML = 'F'
+          break
+        case 'metric':
+          tempUnit.innerHTML = 'C'
+          break
+      }
+    tempWrapper.append(temp, tempUnit)
     leftWrapper.appendChild(tempWrapper)
 
     const feelsLikeWrapper = document.createElement('div')
-    const feelsText = document.createElement('span')
-    feelsText.innerHTML = 'Feels like '
-    const feelsTemp = document.createElement('span')
-    feelsTemp.innerHTML = weatherData.feels_like;
-    feelsTemp.id = 'weather_feelsTemp'
-    const feelsDeg = document.createElement('span')
-    feelsDeg.innerHTML = '&#176;'
-    const feelsUnit = document.createElement('span')
-    switch (config.units) {
-      case '':
-        feelsUnit.innerHTML = 'K'
-        break
-      case 'imperial':
-        feelsUnit.innerHTML = 'F'
-        break
-      case 'metric':
-        feelsUnit.innerHTML = 'C'
-        break
-    }
+      feelsLikeWrapper.id = 'weather_feelsWrapper';
+    const feelsText = document.createElement('span');
+      feelsText.innerHTML = 'Feels like ';
+      feelsText.id = 'weather_feelsText';
+    const feelsTemp = document.createElement('span');
+    feelsTemp.innerHTML = weatherData.temp.feels_like + '&#176;';
+      feelsTemp.id = 'weather_feelsTemp';
+    const feelsUnit = document.createElement('span');
+      switch (configData.units) {
+        case '':
+          feelsUnit.innerHTML = 'K'
+          break
+        case 'imperial':
+          feelsUnit.innerHTML = 'F'
+          break
+        case 'metric':
+          feelsUnit.innerHTML = 'C'
+          break
+      }
 
-    feelsLikeWrapper.append(feelsText, feelsTemp, feelsDeg, feelsUnit)
+    feelsLikeWrapper.append(feelsText, feelsTemp, feelsUnit)
     leftWrapper.appendChild(feelsLikeWrapper)
-    // wrapper.id = 'weather';
 
-    // let fragment = new DocumentFragment();
-    // fragment.append(wrapper);
-    console.log(wrapper)
+    //right wrapper
+
+    // location
+    const locationWrapper = document.createElement('div');
+      locationWrapper.id = 'weather_locationWrapper';
+    const location = document.createElement('div');
+      location.innerHTML = weatherData.location;
+      location.id = 'weather_location';
+
+      locationWrapper.appendChild(location);
+
+    // description
+    const descriptionWrapper = document.createElement('div');
+      descriptionWrapper.id = 'weather_description'
+    const descriptionStaticText = document.createElement('span');
+      descriptionStaticText.innerHTML = 'description: ';
+      descriptionStaticText.id = 'weather_descriptionStatic';
+    const descriptionDynamText = document.createElement('span');
+      descriptionDynamText.innerHTML = weatherData.description;
+      descriptionDynamText.id = 'weather_descriptionDynam';
+
+    descriptionWrapper.append(descriptionStaticText, descriptionDynamText);
+
+    // hi lo tmep
+    const highLowWrapper = document.createElement('div');
+      highLowWrapper.id = 'weather_hiLoWrapper';
+      // high temp
+    const highTempWrapper = document.createElement('span');
+      highTempWrapper.id = 'weather_highTempWrapper';
+    const highTempStaticText = document.createElement('span');
+      highTempStaticText.innerHTML = 'hi: ';
+      highTempStaticText.id = 'weather_highTempStatic';
+    const highTempDynamText = document.createElement('span');
+      highTempDynamText.innerHTML = weatherData.temp.high + '&#176;';
+      highTempDynamText.id = 'weather_highTempDynam';
+
+    highTempWrapper.append(highTempStaticText, highTempDynamText);
+
+      // low temp
+    const lowTempWrapper = document.createElement('span');
+      lowTempWrapper.id = 'weather_lowTempWrapper';
+    const lowTempStaticText = document.createElement('span');
+      lowTempStaticText.innerHTML = 'low: ';
+      lowTempStaticText.id = 'weather_lowTempStatic';
+    const lowTempDynamText = document.createElement('span');
+      lowTempDynamText.innerHTML = weatherData.temp.low + '&#176;';
+      lowTempDynamText.id = 'weather_lowTempDynam';
+
+    lowTempWrapper.append(lowTempStaticText, lowTempDynamText);
+
+    highLowWrapper.append(highTempWrapper, lowTempWrapper);
+
+    // wind
+    const windWrapper = document.createElement('div');
+      windWrapper.id = 'weather_windWrapper';
+
+    const windStaticText = document.createElement('span');
+      windStaticText.innerHTML = 'wind: ';
+      windStaticText.id = 'weather_windStatic';
+    const windDynamText = document.createElement('span');
+      windDynamText.id = 'weather_windDynam';
+    let windUnit;
+      switch (configData.units) {
+        case '':
+          windUnit = 'm/s'
+          break
+        case 'imperial':
+          windUnit = 'mph'
+          break
+        case 'metric':
+          windUnit = 'm/s'
+          break
+      }
+    windDynamText.innerHTML = `${weatherData.wind.speed} ${windUnit}, ${weatherData.wind.direction}`;
+
+    windWrapper.append(windStaticText, windDynamText);
+
+      // humidity
+    const humidityWrapper = document.createElement('div');
+      humidityWrapper.id = 'weather_humidityWrapper';
+
+    const humidityStaticText = document.createElement('span');
+      humidityStaticText.innerHTML = 'humidity: ';
+      humidityStaticText.id = 'weather_humidityStatic';
+    const humidityDynamText = document.createElement('span');
+      humidityDynamText.innerHTML = weatherData.humidity + '%';
+      humidityDynamText.id = 'weather_humidityDynam';
+
+    humidityWrapper.append(humidityStaticText, humidityDynamText);
+
+    rightWrapper.append(locationWrapper, descriptionWrapper, highLowWrapper, windWrapper, humidityWrapper);
+    wrapper.appendChild(rightWrapper);
+  }
+
+  const createDom = function(weatherData, configData){
+    if(configData.type === 'current'){
+      createDomCurrent(weatherData, configData);
+    }
   }
 
   return {
     getData: async function () {
-      // return await validateData()
-      return await getWeather();
+      return await getWeatherCurrent();
     },
 
-    createDom: function (data) {
-      createDomObjects(data)
+    createDom: function (weatherData) {
+      createDom(weatherData, moduleData)
     },
   }
 })()
-
-// weather.getData();

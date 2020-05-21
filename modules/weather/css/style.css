@@ -1,0 +1,58 @@
+div.container.weather_module div {
+  line-height: normal;
+}
+
+#weather_wrapper {
+  display: flex;
+  flex-direction: row;
+  font-size: 12px;
+  font-weight: bold;
+  /* border: 1px black solid; */
+}
+
+#weather_leftWrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  /* border: 1px blue dashed; */
+}
+
+#weather_icon {
+  font-size: 70px;
+  font-weight: normal;
+  align-self: center;
+  margin-bottom: 10px;
+}
+
+#weather_tempWrapper {
+  text-align: center;
+  font-size: 25px;
+}
+
+#weather_rightWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 5px;
+  line-height: 1em;
+}
+
+#weather_locationWrapper {
+  position: relative;
+  /* height: 40%; */
+  font-size: 25px;
+  /* background-color: violet; */
+}
+
+#weather_location {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding-bottom: 15px;
+  /* justify-self: flex-end; */
+}
+
+#weather_lowTempWrapper {
+  margin-left: 15px;
+}
