@@ -6,7 +6,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "jsdoc": "^3.6.4"
+    "fs": "0.0.1-security",
+    "jsdoc": "^3.6.4",
+    "open": "^7.0.4"
   },
   "devDependencies": {},
   "scripts": {
