@@ -1,4 +1,5 @@
 var sample_config = {
+  port: 3000,
   modules: [
     {
       name: 'weather',

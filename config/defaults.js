@@ -1,6 +1,7 @@
 'use strict';
 
-var defaults = {
+const defaults = {
+  port: 3000,
   modules: [
     {
       module: 'weather',
@@ -18,3 +19,5 @@ var defaults = {
     }
   ]
 }
+
+module.exports = defaults;
