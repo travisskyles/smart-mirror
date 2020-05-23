@@ -1,15 +1,16 @@
 'use strict';
 
-var defaults = {
+const defaults = {
+  port: 3000,
   modules: [
     {
       module: 'weather',
       position: 'top_right',
       config: {
         location: {
-          place: null,
-          lat: null,
-          lon: null,
+          city: '', // ex. Los Angeles
+          state: '', // ex. CA
+          country: '', // ex. US
         },
         type: 'current', // current, forecast,
         units: 'imperial', //imperial, metric, default: kelvin
@@ -18,3 +19,5 @@ var defaults = {
     }
   ]
 }
+
+module.exports = defaults;

@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "description": "A smart mirror application created using node.js",
   "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "jsdoc": "^3.6.4",
+    "open": "^7.0.4",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
+    "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,10 +26,5 @@
   "bugs": {
     "url": "https://github.com/tskyles/smart-mirror/issues"
   },
-  "homepage": "https://github.com/tskyles/smart-mirror#readme",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1"
-  }
+  "homepage": "https://github.com/tskyles/smart-mirror#readme"
 }
