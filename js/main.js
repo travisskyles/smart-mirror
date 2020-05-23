@@ -1,11 +1,16 @@
 'use strict'
 
-var Main = (function () {
-  const modules = {
-    names: [],
+class Main{
+  constructor(){
+    this.modules = {
+      names: [],
+    }
   }
+  // modules = {
+  //   names: [],
+  // }
 
-  const loadConfig = function () {
+  _loadConfig(){
     if (typeof config === 'undefined') {
       config = defaults
       console.log('Missing config file. Create config file to customize.')
@@ -14,7 +19,7 @@ var Main = (function () {
       config = Object.assign({}, defaults, config)
       console.log('Config loaded..')
 
-      if(!checkModuleLocations()){
+      if(!this._checkModuleLocations()){
         console.log('multiple modules occupying same area...')
       }else {
         console.log('module locations verified...')
@@ -22,7 +27,7 @@ var Main = (function () {
     }
   }
 
-  const checkModuleLocations = function () {
+  _checkModuleLocations(){
     let positions = {}
     for (let i = 0; i < config.modules.length; i++) {
       if (positions[i.position]) {
@@ -34,23 +39,23 @@ var Main = (function () {
     return true
   }
 
-  const loadModules = function () {
+  _loadModules(){
     console.log('loading modules...')
 
     config.modules.forEach(module => {
-      modules[module.name] = { methods: window[module.name] }
+      this.modules[module.name] = { methods: window[module.name] }
       // modules[module.name].methods.init();
-      modules.names.push(module.name)
+      this.modules.names.push(module.name)
     })
-    setModuleInitData();
-    setModuleDoms()
-    console.log(modules)
+    this._setModuleInitData();
+    this._setModuleDoms()
+    console.log(this.modules)
   }
 
-  const setModuleDoms = function () {
+  _setModuleDoms(){
     console.log('creating module doms...')
 
-    if (isEmpty(modules)) {
+    if (isEmpty(this.modules)) {
       console.log('modules not loaded...')
     }
 
@@ -58,22 +63,22 @@ var Main = (function () {
       const classes = module.position.replace('_', ' ')
       const parent = document.getElementsByClassName(classes)
 
-      if (parent.length > 0) {
+      if(parent.length > 0) {
         const wrapper = parent[0].getElementsByClassName('container')
         wrapper[0].classList.add(`${module.name}_module`)
       }
     })
   }
 
-  const setModuleInitData = async function () {
-    for (let i = 0; i < modules.names.length; i++) {
-      let name = modules.names[i];
+  async _setModuleInitData(){
+    for (let i = 0; i < this.modules.names.length; i++) {
+      let name = this.modules.names[i];
 
       try{
-        let data = await modules[name].methods.getData()
-        modules[name].data = data;
-        console.log('data', modules)
-        insertModuleData();
+        let data = await this.modules[name].methods.getData()
+        this.modules[name].data = data;
+        console.log('data', this.modules)
+        this._insertModuleData();
       }
       catch(e){
         console.error(e);
@@ -82,21 +87,21 @@ var Main = (function () {
     }
   }
 
-  const insertModuleData = function(){
-    console.log(modules.weather.data)
-    modules.weather.methods.createDom(modules.weather.data)
+  _insertModuleData(){
+    console.log(this.modules.weather.data)
+    this.modules.weather.methods.createDom(this.modules.weather.data)
   }
 
-  return {
-    init: function () {
-      loadConfig()
-      
-    },
-    createModules: function () {
-      loadModules()
-    },
-  }
-})()
 
-Main.init()
-Main.createModules()
+  init(){
+    this._loadConfig()
+  }
+
+  createModules(){
+    this._loadModules()
+  }
+}
+
+const main = new Main();
+main.init()
+main.createModules()
