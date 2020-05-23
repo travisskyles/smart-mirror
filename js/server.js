@@ -15,6 +15,14 @@ class Server {
     this.server = app;
   }
 
+  _use(){
+    const directories = ['/modules', '/css', '/js', '/config', '/helpers'];
+    directories.forEach(directory => {
+      console.log(global.root_path + directory);
+      this.server.use(directory, express.static(global.root_path + directory));
+    })
+  }
+
   _get(){
     this.server.get('/', (req, res) => {
       let html = fs.readFileSync(path.resolve(global.root_path + '/index.html'), {encoding: 'utf8'});
@@ -32,6 +40,7 @@ class Server {
   }
 
   start(){
+    this._use();
     this._get();
     this.server.listen(this.port, () => console.log(`server up on ${this.port}`));
     open(`http://localhost:${this.port}/`);

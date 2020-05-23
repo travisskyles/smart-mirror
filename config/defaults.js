@@ -8,9 +8,9 @@ const defaults = {
       position: 'top_right',
       config: {
         location: {
-          place: null,
-          lat: null,
-          lon: null,
+          city: '', // ex. Los Angeles
+          state: '', // ex. CA
+          country: '', // ex. US
         },
         type: 'current', // current, forecast,
         units: 'imperial', //imperial, metric, default: kelvin

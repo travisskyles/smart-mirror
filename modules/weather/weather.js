@@ -12,13 +12,13 @@ var weather = (function () {
     appid: '',
   }
 
-  const moduleData = Object.assign({}, defaults, config.modules[0].config)
+  const moduleData = Object.assign({}, defaults, config.modules[0].config);
 
   const getPlace = function(){
     let place = `${moduleData.location.city},`;
     (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
     place += moduleData.location.country;
-
+    
     return place;
   }
 
