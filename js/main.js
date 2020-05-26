@@ -1,6 +1,6 @@
 'use strict'
 
-const main = (function(){
+let main = (function(){
     const modules = {names: []};
 
 
@@ -87,9 +87,16 @@ const main = (function(){
     modules.weather.methods.createDom(modules.weather.data)
   }
 
+  /**
+  * Public Methods
+  **/
   return{
     init: function(){
       _loadConfig()
+    },
+
+    start: function(){
+      moduleLoader.loadModules()
     },
 
     createModules: function(){
@@ -100,4 +107,5 @@ const main = (function(){
 
 // const main = new Main();
 main.init()
+main.start()
 main.createModules()
