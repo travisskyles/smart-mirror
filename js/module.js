@@ -1,8 +1,8 @@
 'use strict';
 
-class Module {
-  constructor(config){
-    this.config = config;
+const Module = class {
+  constructor(){
+    const __defaults = {};
   }
 
   init(){
@@ -23,6 +23,7 @@ class Module {
 
   static register(name, definition){
     Module.definitions[name] = definition;
+    console.log(Module.definitions);
   }
 
   static create(name){
