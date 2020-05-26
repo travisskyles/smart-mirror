@@ -1,8 +1,8 @@
 'use strict';
 
 class Module {
-  constructor(moduleConfig, moduleDefault){
-    this.defaults = defaults;
+  constructor(config){
+    this.config = config;
   }
 
   init(){
@@ -20,8 +20,18 @@ class Module {
   getStyles(){
 
   }
+
+  static register(name, definition){
+    Module.definitions[name] = definition;
+  }
+
+  static create(name){
+    const module = new Module;
+    Object.keys(Module.definitions[name]).forEach(key => {
+      module[key] = Module.definitions[name][key];
+    })
+    return module;
+  }
 }
 
-Module.register = function(name, definition){
-  
-}
+Module.definitions = {};
