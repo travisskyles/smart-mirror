@@ -14,7 +14,7 @@ var weather = (function () {
 
   const moduleData = Object.assign({}, defaults, config.modules[0].config);
 
-  const getPlace = function(){
+  function getPlace(){
     let place = `${moduleData.location.city},`;
     (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
     place += moduleData.location.country;
@@ -22,7 +22,7 @@ var weather = (function () {
     return place;
   }
 
-  const getWeatherCurrent = async function (){
+  async function getWeatherCurrent(){
 
     let place = getPlace();
 
@@ -53,7 +53,7 @@ var weather = (function () {
       })
   }
 
-  const createDomCurrent = function(weatherData, configData){
+  function createDomCurrent(weatherData, configData){
 
     const moduleLocation = document.getElementsByClassName('container weather_module')
 
@@ -214,7 +214,7 @@ var weather = (function () {
     wrapper.appendChild(rightWrapper);
   }
 
-  const createDom = function(weatherData, configData){
+  function createDom(weatherData, configData){
     if(configData.type === 'current'){
       createDomCurrent(weatherData, configData);
     }

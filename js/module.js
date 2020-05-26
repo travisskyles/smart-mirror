@@ -1,7 +1,9 @@
 'use strict';
 
 class Module {
-
+  constructor(moduleConfig, moduleDefault){
+    this.defaults = defaults;
+  }
 
   init(){
     // do something on instantiation
