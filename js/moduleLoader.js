@@ -8,92 +8,80 @@ const moduleLoader = (function(){
   // load modules from config, loop through and load each module
   const __loadModules = function(){
     let modules = __getModuleObjects();
-    
-    const __loadNext = function(){
-      if(modules.length > 0) {
-        let nextModule = modules[0];
-        __loadModule(nextModule, function () {
-          modules = modules.slice(1);
-          __loadNext;
-        })
-      }
-      __startModules();
-    }
-    __loadNext();
+
+    modules.forEach(module => {
+      __loadModule(module);
+    })
   }
   
-  const __loadModule = function(module, callback){
+  const __loadModule = function(module){
     console.log(`Loading Module: ${module.name}`);
     let path = `${module.path}/${module.fileName}`;
 
     const __createModule = function () {
       const moduleInstance = Module.create(module.name);
-
-      if (moduleInstance) {
-        __loadModuleFiles(module, moduleInstance, function(){
-          modules.push(moduleInstance);
-        });
+      console.log('modobj', moduleInstance);
+      if(moduleInstance){
+        __loadModuleFiles(module, moduleInstance);
       } else {
         return;
       }
     }
 
     if(!loadedModules.includes(path)){
-      __loadFile(path, function(){
-        loadedModules.push(path);
-        __createModule();
-      });
+      __loadFile(path)
+        .then(() => {
+          loadedModules.push(path);
+          __createModule();
+        })
     } else {
       __createModule();
     }
 
   }
     // TODO:
-  const __loadModuleFiles = function(moduleConfigData, moduleObject, callback){
-    console.log(`Loading additional files for: ${moduleConfigData.name}...`);
+  const __loadModuleFiles = function(moduleConfigData, moduleObject){
+    console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
     moduleObject.setData(moduleConfigData);
 
-    moduleObject.loadScripts();
-    moduleObject.loadStyles();
-
-    callback();
+    moduleObject.loadScripts()
+      .then(() => moduleObject.loadStyles())
+      .then(() => modules.push(moduleObject))
+      .then(() => __startModules())
+    
   }
 
-  const __loadFile = function(filePath, callback){
-    const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();;
+  const __loadFile = function(filePath){
+    return new Promise((resolve, reject) => {
+      const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();;
 
-    switch(fileType){
+      switch(fileType){
 
-      case 'js':
-        const scriptArray = Array.from(document.getElementsByTagName('script'));
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = filePath;
-        script.onload = function () {
-          if (typeof callback === "function") { callback(); }
-        };
-        script.onerror = function () {
-          console.error("Error on loading script:", filePath);
-          if (typeof callback === "function") { callback(); }
-        };
-        document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
-        break;
+        case 'js':
+          const scriptArray = Array.from(document.getElementsByTagName('script'));
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = filePath;
+          script.onload = () => resolve();
+          script.onerror = () => {
+            reject(console.error("Error on loading script:", filePath));
+          }
+          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
+          break;
 
-      case 'css':
-        const link = document.createElement('link');
-        link.ref = 'stylesheet';
-        link.type = 'text/css'
-        link.href = filePath;
-        script.onload = function () {
-          if (typeof callback === "function") { callback(); }
-        };
-        script.onerror = function () {
-          console.error("Error on loading style:", filePath);
-          if (typeof callback === "function") { callback(); }
-        };
-        document.getElementsByTagName('head')[0].appendChild(link)
-        break
-    }
+        case 'css':
+          const link = document.createElement('link');
+          link.ref = 'stylesheet';
+          link.type = 'text/css'
+          link.href = filePath;
+          link.onload = () => resolve(link);
+          link.onerror = () => {
+            reject(console.error("Error on loading style:", filePath));
+          }
+          document.getElementsByTagName('head')[0].appendChild(link)
+          break
+        }
+    })
   }
 
   /**
@@ -137,9 +125,8 @@ const moduleLoader = (function(){
     return moduleObjects;
   }
 
-  // TODO: loop through modules and hit start method
+
   const __startModules = function(){
-    console.log('here');
     modules.forEach(module => {
       module.start();
     })
@@ -159,10 +146,10 @@ const moduleLoader = (function(){
         console.log(`File already loaded: ${file}`);
         return;
       }
-      __loadFile(file, function(){
-        loadedFiles.push(file);
-        console.log(loadedFiles);
-      });
+      __loadFile(file)
+        .then(() => {
+          loadedFiles.push(file);
+        })
     }
   }
 })()

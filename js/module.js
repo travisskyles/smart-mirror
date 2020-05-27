@@ -10,46 +10,58 @@ const Module = class {
   }
 
   start(){
-    console.log(`starting: ${this.name} module.`);
+    console.log(`starting: ${this.name} module`);
   }
 
-  getScripts(){
+  __getScripts(){
     return [];
   }
 
-  getStyles(){
+  __getStyles(){
     return [];
   }
 
-  loadScripts(){
-    this.loadModuleDependancies(this.getScripts());
-    console.log(`Scripts loaded for ${this.name} module.`);
+  loadScripts() {
+    return new Promise((resolve, reject) => {
+      this.loadModuleDependancies(this.__getScripts())
+        .then(() => {
+          console.log(`Scripts loaded for ${this.name} module.`);
+          resolve();
+        })
+    })
   }
 
   loadStyles(){
-    this.loadModuleDependancies(this.getStyles());
-    console.log(`Styles loaded for ${this.name} module.`);
+    return new Promise((resolve, reject) => {
+      this.loadModuleDependancies(this.__getStyles())
+        .then(() => {
+          console.log(`Styles loaded for ${this.name} module.`);
+          resolve();
+        })
+    })
   }
 
   setData(configData){
     this.data = configData;
     this.name = configData.name;
-    this.config = this.setConfig(configData.config);
+    this.setConfig(configData.config);
   }
 
   setConfig(moduleConfig){
-    Object.assign({}, this.__defaults, moduleConfig);
+    this.config = Object.assign({}, this.__defaults, moduleConfig);
   }
 
   loadModuleDependancies(fileArray){
-    fileArray.forEach(file => {
-      moduleLoader.loadFile(`${this.path}/${file}`);
+    return new Promise((resolve, reject) => {
+      fileArray.forEach(file => {
+        moduleLoader.loadFile(`${this.data.path}/${file}`);
+      })
+      resolve();
     })
   }
 
   static register(name, definition){
     Module.definitions[name] = definition;
-    console.log(Module.definitions);
   }
 
   static create(name){
