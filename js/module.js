@@ -10,15 +10,41 @@ const Module = class {
   }
 
   start(){
-    console.log(`starting: ${this.name}`);
+    console.log(`starting: ${this.name} module.`);
   }
 
   getScripts(){
-
+    return [];
   }
 
   getStyles(){
+    return [];
+  }
 
+  loadScripts(){
+    this.loadModuleDependancies(this.getScripts());
+    console.log(`Scripts loaded for ${this.name} module.`);
+  }
+
+  loadStyles(){
+    this.loadModuleDependancies(this.getStyles());
+    console.log(`Styles loaded for ${this.name} module.`);
+  }
+
+  setData(configData){
+    this.data = configData;
+    this.name = configData.name;
+    this.config = this.setConfig(configData.config);
+  }
+
+  setConfig(moduleConfig){
+    Object.assign({}, this.__defaults, moduleConfig);
+  }
+
+  loadModuleDependancies(fileArray){
+    fileArray.forEach(file => {
+      moduleLoader.loadFile(`${this.path}/${file}`);
+    })
   }
 
   static register(name, definition){

@@ -13,6 +13,18 @@ Module.register('weather', {
     appid: '',
   },
 
+  __getStyles: function(){
+    return [
+      'css/weather.css',
+    ]
+  },
+
+  __getScripts: function(){
+    return [
+      'helpers.js'
+    ]
+  },
+
   __getPlace: function(){
     let place = `${moduleData.location.city},`;
     (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
