@@ -1,7 +1,8 @@
 'use strict'
 
-var weather = (function () {
-  const defaults = {
+Module.register('weather', {
+
+  _defaults: {
     location: {
       place: null,
       lat: null,
@@ -10,19 +11,29 @@ var weather = (function () {
     type: 'current', // current, forecast
     units: '', //imperial, metric, default Kelvin
     appid: '',
-  }
+  },
 
-  const moduleData = Object.assign({}, defaults, config.modules[0].config);
+  _getStyles: function(){
+    return [
+      'css/weather.css',
+    ]
+  },
 
-  const getPlace = function(){
+  _getScripts: function(){
+    return [
+      'helpers.js'
+    ]
+  },
+
+  _getPlace: function(){
     let place = `${moduleData.location.city},`;
     (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
     place += moduleData.location.country;
     
     return place;
-  }
+  },
 
-  const getWeatherCurrent = async function (){
+  _getWeatherCurrent: async function (){
 
     let place = getPlace();
 
@@ -51,9 +62,9 @@ var weather = (function () {
 
         return weatherObj;
       })
-  }
+  },
 
-  const createDomCurrent = function(weatherData, configData){
+  _createDomCurrent: function(weatherData, configData){
 
     const moduleLocation = document.getElementsByClassName('container weather_module')
 
@@ -212,21 +223,19 @@ var weather = (function () {
 
     rightWrapper.append(locationWrapper, descriptionWrapper, highLowWrapper, windWrapper, humidityWrapper);
     wrapper.appendChild(rightWrapper);
-  }
+  },
 
-  const createDom = function(weatherData, configData){
+  _createDom: function(weatherData, configData){
     if(configData.type === 'current'){
-      createDomCurrent(weatherData, configData);
+      _createDomCurrent(weatherData, configData);
     }
-  }
+  },
 
-  return {
-    getData: async function () {
-      return await getWeatherCurrent();
-    },
+  getData: async function () {
+    return await _getWeatherCurrent();
+  },
 
-    createDom: function (weatherData) {
-      createDom(weatherData, moduleData)
-    },
-  }
-})()
+  createDom: function (weatherData) {
+    _createDom(weatherData, moduleData)
+  },
+})
