@@ -2,7 +2,7 @@
 
 Module.register('weather', {
 
-  __defaults: {
+  _defaults: {
     location: {
       place: null,
       lat: null,
@@ -13,19 +13,19 @@ Module.register('weather', {
     appid: '',
   },
 
-  __getStyles: function(){
+  _getStyles: function(){
     return [
       'css/weather.css',
     ]
   },
 
-  __getScripts: function(){
+  _getScripts: function(){
     return [
       'helpers.js'
     ]
   },
 
-  __getPlace: function(){
+  _getPlace: function(){
     let place = `${moduleData.location.city},`;
     (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
     place += moduleData.location.country;
@@ -33,7 +33,7 @@ Module.register('weather', {
     return place;
   },
 
-  __getWeatherCurrent: async function (){
+  _getWeatherCurrent: async function (){
 
     let place = getPlace();
 
@@ -64,7 +64,7 @@ Module.register('weather', {
       })
   },
 
-  __createDomCurrent: function(weatherData, configData){
+  _createDomCurrent: function(weatherData, configData){
 
     const moduleLocation = document.getElementsByClassName('container weather_module')
 
@@ -225,17 +225,17 @@ Module.register('weather', {
     wrapper.appendChild(rightWrapper);
   },
 
-  __createDom: function(weatherData, configData){
+  _createDom: function(weatherData, configData){
     if(configData.type === 'current'){
-      __createDomCurrent(weatherData, configData);
+      _createDomCurrent(weatherData, configData);
     }
   },
 
   getData: async function () {
-    return await __getWeatherCurrent();
+    return await _getWeatherCurrent();
   },
 
   createDom: function (weatherData) {
-    __createDom(weatherData, moduleData)
+    _createDom(weatherData, moduleData)
   },
 })

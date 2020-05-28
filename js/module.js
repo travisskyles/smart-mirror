@@ -2,7 +2,7 @@
 
 const Module = class {
   constructor(){
-    const __defaults = {};
+    const _defaults = {};
   }
 
   init(){
@@ -10,20 +10,24 @@ const Module = class {
   }
 
   start(){
-    console.log(`starting: ${this.name} module`);
+    console.log(`Starting: ${this.name} module`);
   }
 
-  __getScripts(){
+  _getScripts(){
     return [];
   }
 
-  __getStyles(){
+  _getStyles(){
     return [];
   }
-
+  /**
+   *
+   *
+   * @returns {promise}
+   */
   loadScripts() {
     return new Promise((resolve, reject) => {
-      this.loadModuleDependancies(this.__getScripts())
+      this.loadModuleDependancies(this._getScripts())
         .then(() => {
           console.log(`Scripts loaded for ${this.name} module.`);
           resolve();
@@ -33,7 +37,7 @@ const Module = class {
 
   loadStyles(){
     return new Promise((resolve, reject) => {
-      this.loadModuleDependancies(this.__getStyles())
+      this.loadModuleDependancies(this._getStyles())
         .then(() => {
           console.log(`Styles loaded for ${this.name} module.`);
           resolve();
@@ -48,7 +52,7 @@ const Module = class {
   }
 
   setConfig(moduleConfig){
-    this.config = Object.assign({}, this.__defaults, moduleConfig);
+    this.config = Object.assign({}, this._defaults, moduleConfig);
   }
 
   loadModuleDependancies(fileArray){

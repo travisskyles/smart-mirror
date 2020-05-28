@@ -40,6 +40,9 @@ let main = (function(){
     return true
   }
 
+  function _modulesStarted(modules){
+    //TODO: what to do once modules have been loaded and started
+  }
   // function _loadModules(){
   //   console.log('loading modules...')
 
@@ -104,6 +107,10 @@ let main = (function(){
     start: function(){
       moduleLoader.loadModules()
     },
+
+    modulesStarted(){
+      _modulesStarted();
+    }
 
     // createModules: function(){
     //   _loadModules()

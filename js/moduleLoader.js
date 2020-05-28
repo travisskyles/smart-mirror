@@ -1,57 +1,109 @@
 'use strict';
-
+/**
+ *
+ *
+ * @returns
+ */
 const moduleLoader = (function(){
   const loadedModules = [];
   const loadedFiles = [];
   const modules = [];
 
-  // load modules from config, loop through and load each module
-  const __loadModules = function(){
-    let modules = __getModuleObjects();
+  /**
+   * Calls _getModules to get an array of module data objects.
+   * Then calls _loadModule on each module data object.
+   * @method _loadModules
+   * @private
+   */
+  const _loadModules = function(){
+      let modules = _getModuleObjects();
 
-    modules.forEach(module => {
-      __loadModule(module);
-    })
-  }
-  
-  const __loadModule = function(module){
-    console.log(`Loading Module: ${module.name}`);
-    let path = `${module.path}/${module.fileName}`;
-
-    const __createModule = function () {
-      const moduleInstance = Module.create(module.name);
-      console.log('modobj', moduleInstance);
-      if(moduleInstance){
-        __loadModuleFiles(module, moduleInstance);
-      } else {
-        return;
+      const loadNext = function(){
+        if(modules.length > 0){
+          let nextModule = modules[0];
+          _loadModule(nextModule)
+            .then(() => {
+              modules = modules.slice(1);
+              loadNext();
+            })
+        } else {
+          _startModules();
+        }
       }
-    }
+      loadNext()
+  }
 
-    if(!loadedModules.includes(path)){
-      __loadFile(path)
-        .then(() => {
-          loadedModules.push(path);
-          __createModule();
-        })
-    } else {
-      __createModule();
-    }
+  /**
+   * Takes in a module data object.
+   * Creates a file path and checks if that module has been loaded.
+   * If true calls _createModule.
+   * If false calls _loadFile using the file path, pushes
+   * the path into loadedModules and calls _createModule.
+   * @method _loadModule
+   * @private
+   * @param {object} module a module data object
+   */
+  const _loadModule = function(module){
+    return new Promise((resolve, reject) => {
+      console.log(`Loading Module: ${module.name}`);
+      let path = `${module.path}/${module.fileName}`;
+
+      if (!loadedModules.includes(path)) {
+        resolve(_loadFile(path)
+          .then(() => {
+            _createModule(module);
+            loadedModules.push(path);
+          }))
+      } else {
+        resolve(_createModule(module));
+      }
+    })
 
   }
-    // TODO:
-  const __loadModuleFiles = function(moduleConfigData, moduleObject){
+
+  /**
+   * Creates a new Module class instance
+   * If successfully created, calls _loadModuleFiles to load module accessory files.
+   * Otherwise returns
+   * @method _createModule
+   * @private
+   * @param {object} module module data object
+   * @returns if unable to create new Module instance
+   */
+  const _createModule = function(module){
+    const moduleInstance = Module.create(module.name);
+    if (moduleInstance) {
+      _loadModuleFiles(module, moduleInstance);
+    } else {
+      return;
+    }
+  }
+
+  /**
+   * Sets module data and loads additional files required for module.
+   * Adds module instances to modules array.
+   * @method _loadModuleFiles
+   * @private
+   * @param {object} moduleConfigData module data object
+   * @param {object} moduleObject module class instance
+   */
+  const _loadModuleFiles = function(moduleConfigData, moduleObject){
     console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
     moduleObject.setData(moduleConfigData);
 
-    moduleObject.loadScripts()
-      .then(() => moduleObject.loadStyles())
-      .then(() => modules.push(moduleObject))
-      .then(() => __startModules())
-    
+    moduleObject.loadScripts();
+    moduleObject.loadStyles();
+    modules.push(moduleObject);
   }
 
-  const __loadFile = function(filePath){
+  /**
+   * Load file and appends it to index.html
+   * @function _loadFile
+   * @private
+   * @param {string} filePath path to file from root
+   * @returns {promise} returns a promise that resolves once the script is loaded
+   */
+  const _loadFile = function(filePath){
     return new Promise((resolve, reject) => {
       const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();;
 
@@ -85,23 +137,26 @@ const moduleLoader = (function(){
   }
 
   /**
-  * __getModulesFromConfig()
+  * _getModulesFromConfig()
   * retrieves module data from config file
-  * @function
+  * @function _getModulesFromConfig
+  * @private
   * @returns {arr} returns an array of modules in config file
   */
-  const __getModulesFromConfig = function(){
+  const _getModulesFromConfig = function(){
     return config.modules;
   }
 
   /**
-   * __getModuleObjects()
+   * _getModuleObjects()
    * parses module data from config into seperate objects
-   * @function
-   * @returns {arr} array of module data
+   * return nothing if module is disabled
+   * @function _getModuleObjects
+   * @private
+   * @returns {array} array of module data objects
    */
-  const __getModuleObjects = function(){
-    const modules = __getModulesFromConfig();
+  const _getModuleObjects = function(){
+    const modules = _getModulesFromConfig();
     const moduleObjects = [];
 
     modules.forEach((module, index) => {
@@ -125,11 +180,18 @@ const moduleLoader = (function(){
     return moduleObjects;
   }
 
-
-  const __startModules = function(){
+  /**
+   * loops through the module instances and calls the start method.
+   * Then tells the main method that the modules have been started and passes it the modules.
+   * @method _startModules
+   * @private
+   * 
+   */
+  const _startModules = function(){
     modules.forEach(module => {
       module.start();
     })
+    main.modulesStarted(modules);
   }
 
   /******************
@@ -137,16 +199,26 @@ const moduleLoader = (function(){
    ******************/
 
   return {
+    /**
+     * Initiates the module loading sequence
+     * @function loadModules
+     */
     loadModules: function(){
-      __loadModules();
+      _loadModules();
+
     },
 
+    /**
+     * Calls the _loadFile method to load a file and records that file.
+     * @function loadFile
+     * @param {string} file file path in string format
+     */
     loadFile: function(file){
       if(loadedFiles.includes(file)){
         console.log(`File already loaded: ${file}`);
         return;
       }
-      __loadFile(file)
+      _loadFile(file)
         .then(() => {
           loadedFiles.push(file);
         })
