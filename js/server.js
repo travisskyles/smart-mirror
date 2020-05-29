@@ -16,7 +16,7 @@ class Server {
   }
 
   _use(){
-    const directories = ['/modules', '/css', '/js', '/config', '/helpers'];
+    const directories = ['/modules', '/css', '/js', '/config', '/helpers', '/dependencies', '/node_modules'];
     directories.forEach(directory => {
       console.log(global.root_path + directory);
       this.server.use(directory, express.static(global.root_path + directory));

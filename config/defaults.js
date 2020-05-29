@@ -16,6 +16,12 @@ const defaults = {
         units: 'imperial', //imperial, metric, default: kelvin
         appid: null
       }
+    },
+    {
+      name: 'messages',
+      disabled: 'false',
+      position: 'middle_third',
+      config: {},
     }
   ]
 }

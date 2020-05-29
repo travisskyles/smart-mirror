@@ -144,6 +144,7 @@ const moduleLoader = (function(){
   * @returns {arr} returns an array of modules in config file
   */
   const _getModulesFromConfig = function(){
+    console.log(config);
     return config.modules;
   }
 
@@ -158,6 +159,7 @@ const moduleLoader = (function(){
   const _getModuleObjects = function(){
     const modules = _getModulesFromConfig();
     const moduleObjects = [];
+    console.log(modules, moduleObjects);
 
     modules.forEach((module, index) => {
 
@@ -217,6 +219,9 @@ const moduleLoader = (function(){
       if(loadedFiles.includes(file)){
         console.log(`File already loaded: ${file}`);
         return;
+      }
+      if(file.includes('node_modules')){
+        file = file.substring(file.indexOf('node_modules'));
       }
       _loadFile(file)
         .then(() => {

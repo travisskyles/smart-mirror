@@ -64,6 +64,10 @@ const Module = class {
     })
   }
 
+  getDom(){
+    
+  }
+
   static register(name, definition){
     Module.definitions[name] = definition;
   }

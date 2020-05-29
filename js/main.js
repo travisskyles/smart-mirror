@@ -101,14 +101,14 @@ let main = (function(){
   **/
   return{
     init: function(){
-      _loadConfig()
+      _loadConfig();
     },
 
     start: function(){
       moduleLoader.loadModules()
     },
 
-    modulesStarted(){
+    modulesStarted: function(){
       _modulesStarted();
     }
 

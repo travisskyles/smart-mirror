@@ -21,7 +21,8 @@ Module.register('weather', {
 
   _getScripts: function(){
     return [
-      'helpers.js'
+      'helpers.js',
+      dependencies['ejs'],
     ]
   },
 
