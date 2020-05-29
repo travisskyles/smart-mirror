@@ -45,7 +45,7 @@ const Module = class {
     })
   }
 
-  setData(configData){
+  setConfigData(configData){
     this.data = configData;
     this.name = configData.name;
     this.setConfig(configData.config);
@@ -64,8 +64,27 @@ const Module = class {
     })
   }
 
+  // get template data and template and render the template
   getDom(){
-    
+    return new Promise((resolve, reject) => {
+      const div = document.createElement('div');
+      const templateFile = this._getTemplateFile();
+      const templateData = this._getTemplateData();
+
+      ejs.renderFile(templateFile, templateData, ((err, string) => {
+        div.appendChild(string);
+      }))
+
+      resolve(div);
+    })
+  }
+  // get template file
+  _getTemplateFile(){
+    return `${this.path}/${this.name}.ejs`;
+  }
+  // get data for ejs module
+  _getTemplateData(){
+
   }
 
   static register(name, definition){

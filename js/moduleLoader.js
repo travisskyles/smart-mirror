@@ -89,7 +89,7 @@ const moduleLoader = (function(){
    */
   const _loadModuleFiles = function(moduleConfigData, moduleObject){
     console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
-    moduleObject.setData(moduleConfigData);
+    moduleObject.setConfigData(moduleConfigData);
 
     moduleObject.loadScripts();
     moduleObject.loadStyles();
@@ -105,13 +105,15 @@ const moduleLoader = (function(){
    */
   const _loadFile = function(filePath){
     return new Promise((resolve, reject) => {
-      const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();;
+      const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();
+      let scriptArray;
+      let script;
 
       switch(fileType){
 
         case 'js':
-          const scriptArray = Array.from(document.getElementsByTagName('script'));
-          const script = document.createElement('script');
+          scriptArray = Array.from(document.getElementsByTagName('script'));
+          script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = filePath;
           script.onload = () => resolve();
@@ -132,6 +134,19 @@ const moduleLoader = (function(){
           }
           document.getElementsByTagName('head')[0].appendChild(link)
           break
+
+        case 'tpscript':
+          filePath = filePath.slice(0, filePath.lastIndexOf('.'));
+          scriptArray = Array.from(document.getElementsByTagName('script'));
+          script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = filePath;
+          script.onload = () => resolve();
+          script.onerror = () => {
+            reject(console.error("Error on loading script:", filePath));
+          }
+          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[0]);
+          break;
         }
     })
   }
@@ -222,6 +237,7 @@ const moduleLoader = (function(){
       }
       if(file.includes('node_modules')){
         file = file.substring(file.indexOf('node_modules'));
+        file += '.tpscript';
       }
       _loadFile(file)
         .then(() => {
