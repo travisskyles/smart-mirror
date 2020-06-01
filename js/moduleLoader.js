@@ -106,6 +106,7 @@ const moduleLoader = (function(){
   const _loadFile = function(filePath){
     return new Promise((resolve, reject) => {
       const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();
+      const name = filePath.slice(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'));
       let scriptArray;
       let script;
 
@@ -116,11 +117,11 @@ const moduleLoader = (function(){
           script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = filePath;
-          script.onload = () => resolve();
+          script.onload = () => resolve(script);
           script.onerror = () => {
             reject(console.error("Error on loading script:", filePath));
           }
-          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
+          document.getElementsByTagName('body')[0].appendChild(script);
           break;
 
         case 'css':
@@ -145,7 +146,7 @@ const moduleLoader = (function(){
           script.onerror = () => {
             reject(console.error("Error on loading script:", filePath));
           }
-          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[0]);
+          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
           break;
         }
     })
@@ -237,6 +238,10 @@ const moduleLoader = (function(){
       }
       if(file.includes('node_modules')){
         file = file.substring(file.indexOf('node_modules'));
+        file += '.tpscript';
+      }
+      if (file.includes('dependencies')) {
+        file = file.substring(file.indexOf('dependencies'));
         file += '.tpscript';
       }
       _loadFile(file)

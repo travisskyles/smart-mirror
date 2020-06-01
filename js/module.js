@@ -66,21 +66,25 @@ const Module = class {
 
   // get template data and template and render the template
   getDom(){
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const div = document.createElement('div');
-      const templateFile = this._getTemplateFile();
-      const templateData = this._getTemplateData();
+      const templateString = await this._getTemplateString();
+      const templateData =  await this._getTemplateData();
 
-      ejs.renderFile(templateFile, templateData, ((err, string) => {
-        div.appendChild(string);
-      }))
-
+      let html = ejs.render(templateString, templateData)
+      console.log(html);
+      div.innerHTML = html;
+ 
       resolve(div);
     })
   }
-  // get template file
-  _getTemplateFile(){
-    return `${this.path}/${this.name}.ejs`;
+  // get template string
+  _getTemplateString(){
+    return new Promise((resolve, reject) => {
+      let template = fetch(`/modules/${this.name}/${this.name}.ejs`)
+        .then(response => response.text());
+      resolve(template);
+    })
   }
   // get data for ejs module
   _getTemplateData(){

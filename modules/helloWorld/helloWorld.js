@@ -10,10 +10,12 @@ Module.register('helloWorld', {
   _getScripts: function(){
     return [
       dependencies['ejs'],
+      'helloWorldTemplate.js',
+      'helloWorld.ejs',
     ]
   },
 
   _getTemplateData: function(){
-    return this.config.messages.all;
+    return {message: this.config.messages.all};
   }
 })
