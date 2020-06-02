@@ -21,7 +21,7 @@ const moduleLoader = (function(){
       const loadNext = function(){
         if(modules.length > 0){
           let nextModule = modules[0];
-          _loadModule(nextModule)
+         _loadModule(nextModule)
             .then(() => {
               modules = modules.slice(1);
               loadNext();
@@ -49,13 +49,17 @@ const moduleLoader = (function(){
       let path = `${module.path}/${module.fileName}`;
 
       if (!loadedModules.includes(path)) {
-        resolve(_loadFile(path)
+        _loadFile(path)
           .then(() => {
-            _createModule(module);
-            loadedModules.push(path);
-          }))
+            _createModule(module)
+              .then(() => {
+                loadedModules.push(path);
+                resolve();
+              })
+          })
       } else {
-        resolve(_createModule(module));
+        _createModule(module)
+          .then(() => resolve());
       }
     })
 
@@ -71,12 +75,16 @@ const moduleLoader = (function(){
    * @returns if unable to create new Module instance
    */
   const _createModule = function(module){
-    const moduleInstance = Module.create(module.name);
-    if (moduleInstance) {
-      _loadModuleFiles(module, moduleInstance);
-    } else {
-      return;
-    }
+    return new Promise((resolve, reject) => {
+      const moduleInstance = Module.create(module.name);
+      if (moduleInstance) {
+        _loadModuleFiles(module, moduleInstance)
+          .then(() => resolve());
+      } else {
+        resolve();
+      }
+    })
+
   }
 
   /**
@@ -88,12 +96,18 @@ const moduleLoader = (function(){
    * @param {object} moduleObject module class instance
    */
   const _loadModuleFiles = function(moduleConfigData, moduleObject){
-    console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
-    moduleObject.setConfigData(moduleConfigData);
-
-    moduleObject.loadScripts();
-    moduleObject.loadStyles();
-    modules.push(moduleObject);
+    return new Promise((resolve, reject) => {
+      console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
+      moduleObject.setConfigData(moduleConfigData);
+      moduleObject.loadScripts()
+        .then(() => {
+          moduleObject.loadStyles()
+            .then(() => {
+              modules.push(moduleObject);
+              resolve();
+            })
+        })
+    })
   }
 
   /**
@@ -117,7 +131,10 @@ const moduleLoader = (function(){
           script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = filePath;
-          script.onload = () => resolve(script);
+          script.onload = () => {
+            console.log(`${name}.${fileType} loaded`)
+            resolve();
+          }
           script.onerror = () => {
             reject(console.error("Error on loading script:", filePath));
           }
@@ -142,7 +159,7 @@ const moduleLoader = (function(){
           script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = filePath;
-          script.onload = () => resolve();
+          script.onload = () => resolve(script);
           script.onerror = () => {
             reject(console.error("Error on loading script:", filePath));
           }
@@ -238,16 +255,10 @@ const moduleLoader = (function(){
       }
       if(file.includes('node_modules')){
         file = file.substring(file.indexOf('node_modules'));
-        file += '.tpscript';
       }
-      if (file.includes('dependencies')) {
-        file = file.substring(file.indexOf('dependencies'));
-        file += '.tpscript';
-      }
-      _loadFile(file)
-        .then(() => {
-          loadedFiles.push(file);
-        })
+      const loadedFile = _loadFile(file);
+      loadedFiles.push(file);
+      return loadedFile;
     }
   }
 })()

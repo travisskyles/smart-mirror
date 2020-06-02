@@ -25,22 +25,21 @@ const Module = class {
    *
    * @returns {promise}
    */
-  loadScripts() {
-    return new Promise((resolve, reject) => {
+  async loadScripts() {
+    return new Promise(async (resolve, reject) => {
       this.loadModuleDependancies(this._getScripts())
         .then(() => {
-          console.log(`Scripts loaded for ${this.name} module.`);
-          resolve();
+          resolve(console.log(`All scripts loaded for ${this.name} module.`));
         })
     })
   }
 
-  loadStyles(){
+  async loadStyles(){
     return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getStyles())
         .then(() => {
-          console.log(`Styles loaded for ${this.name} module.`);
-          resolve();
+          resolve(console.log(`All styles loaded for ${this.name} module.`)
+          );
         })
     })
   }
@@ -55,13 +54,16 @@ const Module = class {
     this.config = Object.assign({}, this._defaults, moduleConfig);
   }
 
-  loadModuleDependancies(fileArray){
-    return new Promise((resolve, reject) => {
-      fileArray.forEach(file => {
-        moduleLoader.loadFile(`${this.data.path}/${file}`);
-      })
-      resolve();
-    })
+  async loadModuleDependancies(fileArray){
+    const promiseArray = [];
+
+    for(const file of fileArray) {
+      console.log(file + ' loading...');
+      promiseArray.push(moduleLoader.loadFile(`${this.data.path}/${file}`));
+    }
+
+    await Promise.allSettled(promiseArray);
+    return;
   }
 
   // get template data and template and render the template
@@ -88,7 +90,7 @@ const Module = class {
   }
   // get data for ejs module
   _getTemplateData(){
-
+    return {};
   }
 
   static register(name, definition){

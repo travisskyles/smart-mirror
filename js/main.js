@@ -78,7 +78,7 @@ let main = (function(){
         })
         module.getDom()
           .then(html => {
-            wrapper.appendChild(html);
+            wrapper[0].appendChild(html);
           })
       }
     })
