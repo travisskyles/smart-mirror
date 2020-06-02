@@ -10,7 +10,6 @@ Module.register('helloWorld', {
   _getScripts: function(){
     return [
       dependencies['ejs'],
-      // 'helloWorld.ejs',
     ]
   },
 

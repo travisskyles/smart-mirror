@@ -38,8 +38,7 @@ const Module = class {
     return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getStyles())
         .then(() => {
-          resolve(console.log(`All styles loaded for ${this.name} module.`)
-          );
+          resolve(console.log(`All styles loaded for ${this.name} module.`));
         })
     })
   }

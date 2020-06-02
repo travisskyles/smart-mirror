@@ -143,28 +143,31 @@ const moduleLoader = (function(){
 
         case 'css':
           const link = document.createElement('link');
-          link.ref = 'stylesheet';
+          link.rel = 'stylesheet';
           link.type = 'text/css'
           link.href = filePath;
-          link.onload = () => resolve(link);
+          link.onload = () => {
+            console.log(`${name}.${fileType} loaded`)
+            resolve();
+          }
           link.onerror = () => {
             reject(console.error("Error on loading style:", filePath));
           }
           document.getElementsByTagName('head')[0].appendChild(link)
           break
 
-        case 'tpscript':
-          filePath = filePath.slice(0, filePath.lastIndexOf('.'));
-          scriptArray = Array.from(document.getElementsByTagName('script'));
-          script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = filePath;
-          script.onload = () => resolve(script);
-          script.onerror = () => {
-            reject(console.error("Error on loading script:", filePath));
-          }
-          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
-          break;
+        // case 'tpscript':
+        //   filePath = filePath.slice(0, filePath.lastIndexOf('.'));
+        //   scriptArray = Array.from(document.getElementsByTagName('script'));
+        //   script = document.createElement('script');
+        //   script.type = 'text/javascript';
+        //   script.src = filePath;
+        //   script.onload = () => resolve(script);
+        //   script.onerror = () => {
+        //     reject(console.error("Error on loading script:", filePath));
+        //   }
+        //   document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
+        //   break;
         }
     })
   }

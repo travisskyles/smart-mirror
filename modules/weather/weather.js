@@ -34,6 +34,16 @@ Module.register('weather', {
     return place;
   },
 
+  _getTemplateData: async function(){
+    let place = getPlace();
+
+    return fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=${moduleData.appid}`)
+      .then(response => response.json())
+      .then(results => {
+        console.log('results', results)
+      })
+  },
+
   _getWeatherCurrent: async function (){
 
     let place = getPlace();
