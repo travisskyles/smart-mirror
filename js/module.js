@@ -25,8 +25,8 @@ const Module = class {
    *
    * @returns {promise}
    */
-  async loadScripts() {
-    return new Promise(async (resolve, reject) => {
+  loadScripts() {
+    return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getScripts())
         .then(() => {
           resolve(console.log(`All scripts loaded for ${this.name} module.`));
@@ -34,7 +34,7 @@ const Module = class {
     })
   }
 
-  async loadStyles(){
+  loadStyles(){
     return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getStyles())
         .then(() => {
@@ -73,7 +73,6 @@ const Module = class {
       const templateData =  await this._getTemplateData();
 
       let html = ejs.render(templateString, templateData)
-      console.log(html);
       div.innerHTML = html;
  
       resolve(div);
@@ -82,9 +81,16 @@ const Module = class {
   // get template string
   _getTemplateString(){
     return new Promise((resolve, reject) => {
-      let template = fetch(`/modules/${this.name}/${this.name}.ejs`)
-        .then(response => response.text());
-      resolve(template);
+      fetch(`/modules/${this.name}/${this.name}.ejs`)
+        .then(response => {
+          resolve(response.text());
+        })
+        .catch(e => {
+          reject(() => {
+            console.error(e);
+            console.log(`No .ejs file found for ${this.name} module`)
+          });
+        })
     })
   }
   // get data for ejs module
@@ -103,6 +109,7 @@ const Module = class {
     })
     return module;
   }
+
 }
 
 Module.definitions = {};

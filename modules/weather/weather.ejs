@@ -1,0 +1,54 @@
+
+  <div id='weather_wrapper'>
+
+    <% data.days.forEach(day => { %> 
+    <% if(data.type === 'current'){ %>
+      
+    <div id='weather_leftWrapper'>
+      <i id='weather_icon' class="wi wi-owm-<%= day.icon %>"></i>
+      <div id="weather_tempWrapper">
+        <p id="weather_temp">
+          <%= day.temp %><%- data.units.temp %>
+        </p>
+      </div>
+      <div id="weather_feelsWrapper">
+        <p id="weather_feelsText">
+          Feels like: <%= day.feelsLike%><%- data.units.temp %>
+        </p>
+      </div>
+    </div>
+    <div id="weather_rightWrapper">
+      <div id="weather_locationWrapper">
+        <p id="weather_location">
+          <%= data.location.city %>
+        </p>
+      </div>
+      <div id="weather_description">
+        <p id="weather_descriptionText">
+          Description: <%= day.description %>
+        </p>
+      </div>
+      <div id="weather_highTempWrapper">
+        <p id="weather_highTempText">
+          Hi: <%= day.highTemp%><%- data.units.temp %>
+        </p>
+      </div>
+      <div id="weather_lowTempWrapper">
+        <p id="weather_lowTempText">
+          Lo: <%= day.lowTemp%><%- data.units.temp %>
+        </p>
+      </div>
+      <div id="weather_windWrapper">
+        <p id="weather_windText">
+          Wind: <%= day.windSpeed + ' ' + data.units.speed + ', ' + day.windDirection %>
+        </p>
+      </div>
+      <div id="weather_humidityWrapper">
+        <p id="weather_humidityText">
+          Humidity: <%= day.humidity %>%
+        </p>
+      </div>
+    </div>
+    <% } %>
+    <% }) %> 
+  </div>

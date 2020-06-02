@@ -101,6 +101,7 @@ const moduleLoader = (function(){
       moduleObject.setConfigData(moduleConfigData);
       moduleObject.loadScripts()
         .then(() => {
+          console.log('got here');
           moduleObject.loadStyles()
             .then(() => {
               modules.push(moduleObject);
@@ -252,13 +253,17 @@ const moduleLoader = (function(){
      * @param {string} file file path in string format
      */
     loadFile: function(file){
-      if(loadedFiles.includes(file)){
-        console.log(`File already loaded: ${file}`);
-        return;
-      }
       if(file.includes('node_modules')){
         file = file.substring(file.indexOf('node_modules'));
       }
+      if(file.includes('http')){
+        file = file.substring(file.indexOf('http'));
+      }
+      if (loadedFiles.includes(file)) {
+        console.log(`File already loaded: ${file}`);
+        return;
+      }
+
       const loadedFile = _loadFile(file);
       loadedFiles.push(file);
       return loadedFile;
