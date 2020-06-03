@@ -3,6 +3,7 @@
 Module.register('weather', {
 
   _defaults: {
+    updateInterval: 10000,
     location: {
       place: null,
       lat: null,
@@ -31,24 +32,24 @@ Module.register('weather', {
   },
 
   _getPlace: function(){
-    let place = `${this.config.location.city},`;
-    (this.config.location.state) ? place += `${this.config.location.state},` : place;
-    place += this.config.location.country;
-    
+    let place = `${this.data.config.location.city},`;
+    (this.data.config.location.state) ? place += `${this.data.config.location.state},` : place;
+    place += this.data.config.location.country;
+
     return place;
   },
 
   _getForcastType: function(){
-    if(this.config.type === 'current'){
+    if(this.data.config.type === 'current'){
       return 'current';
     }
-    if(this.config.type === 'forcast'){
+    if(this.data.config.type === 'forcast'){
       return 'forecast/daily';
     }
   },
 
   _getUnitType: function(){
-    const unitType = this.config.units.toLowerCase();
+    const unitType = this.data.config.units.toLowerCase();
     let units = {}
     switch(unitType){
       case 'imperial':
@@ -75,13 +76,13 @@ Module.register('weather', {
     let units = this._getUnitType();
     let weatherData = {
       units: units,
-      type: this.config.type,
-      location: this.config.location,
+      type: this.data.config.type,
+      location: this.data.config.location,
       current: [],
       forecast: [],
     };
 
-    switch(this.config.type){
+    switch(this.data.config.type){
 
       case 'current':
         await Promise.all([
@@ -96,15 +97,17 @@ Module.register('weather', {
             weatherData.forecast.push(new WeatherDay(results.data[0]));
           })
         ])
+        console.log('weatherData', weatherData);
         return { data: weatherData }
 
       case 'forecast':
         return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
           .then(response => response.json())
           .then(results => {
-            for(let i = 0; i < this.config.forecastDays; i++){
+            for(let i = 0; i < this.data.config.forecastDays; i++){
               weatherData.forecast.push(new WeatherDay(results.data[i]));
             }
+            console.log('weatherData', weatherData);
             return { data: weatherData };
         })
     }

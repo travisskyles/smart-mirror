@@ -78,10 +78,35 @@ let main = (function(){
         })
         module.getDom()
           .then(html => {
-            wrapper[0].appendChild(html);
+            wrapper[0].innerHTML = html;
+          })
+          .then(() => {
+            _updateModuleDom(module);
           })
       }
     })
+  }
+
+  function _updateModuleDom(module){
+    console.log('update', module);
+      const parentClasses = module.data.position.replace('_', ' ')
+      const parent = document.getElementsByClassName(parentClasses)
+
+      if (parent.length > 0) {
+        const wrapper = parent[0].getElementsByClassName(module.name)
+
+        if (!module.data.config.updateInterval){
+          console.error('cannot update without an interval');
+          return
+        }
+
+        setInterval(() => {
+          module.updateDom()
+            .then(html => {
+              wrapper[0].innerHTML = html;
+            })
+        }, module.data.config.updateInterval)
+    }
   }
 
   // async function _setModuleInitData(){
@@ -120,7 +145,11 @@ let main = (function(){
 
     modulesStarted: function(modules){
       _modulesStarted(modules);
-    }
+    },
+
+    // updateDom: function(modules){
+    //   _updateModules(modules)
+    // }
 
     // createModules: function(){
     //   _loadModules()

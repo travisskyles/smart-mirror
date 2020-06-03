@@ -50,7 +50,7 @@ const Module = class {
   }
 
   setConfig(moduleConfig){
-    this.config = Object.assign({}, this._defaults, moduleConfig);
+    this.data.config = Object.assign({}, this._defaults, moduleConfig);
   }
 
   async loadModuleDependancies(fileArray){
@@ -68,14 +68,11 @@ const Module = class {
   // get template data and template and render the template
   getDom(){
     return new Promise(async (resolve, reject) => {
-      const div = document.createElement('div');
-      const templateString = await this._getTemplateString();
-      const templateData =  await this._getTemplateData();
-      console.log(templateData);
-      let html = ejs.render(templateString, templateData)
-      div.innerHTML = html;
- 
-      resolve(div);
+      this.data.templateString = await this._getTemplateString();
+      this.data.templateData =  await this._getTemplateData();
+      console.log(this.data.templateData);
+      let html = ejs.render(this.data.templateString, this.data.templateData)
+      resolve(html);
     })
   }
   // get template string
@@ -96,6 +93,21 @@ const Module = class {
   // get data for ejs module
   _getTemplateData(){
     return {};
+  }
+
+  async updateDom(){
+    return new Promise(async (resolve, reject) => {
+      let templateData = await this._getTemplateData();
+      console.log('update', templateData);
+      if (!templateData) {
+        console.error(`Error updating ${this.name} module data`);
+      } else {
+        this.data.templateData = templateData;
+        let html = ejs.render(this.data.templateString, this.data.templateData)
+
+        resolve(html);
+      }
+    })
   }
 
   static register(name, definition){

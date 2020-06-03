@@ -2,8 +2,9 @@
 
 Module.register('helloWorld', {
   _defaults: {
+    updateInterval: 1000, // how often the module should update the dom in milliseconds
     messages: {
-      all: ['Hello World'],
+      all: ['Hello World', 0],
     },
   },
 
@@ -14,6 +15,7 @@ Module.register('helloWorld', {
   },
 
   _getTemplateData: function(){
-    return {message: this.config.messages.all};
-  }
-})
+    this.data.config.messages.all[1]++;
+    return {messages: this.data.config.messages};
+  },
+});
