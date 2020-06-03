@@ -1,7 +1,7 @@
 'use strict'
 
 let main = (function(){
-    const modules = {names: []};
+  // const modules = [];
 
 
 
@@ -42,6 +42,7 @@ let main = (function(){
 
   function _modulesStarted(modules){
     //TODO: what to do once modules have been loaded and started
+    _setModuleDoms(modules);
   }
   // function _loadModules(){
   //   console.log('loading modules...')
@@ -56,23 +57,57 @@ let main = (function(){
   //   console.log(modules)
   // }
 
-  // function _setModuleDoms(){
-  //   console.log('creating module doms...')
+  function _setModuleDoms(modules){
+    console.log('creating module doms...')
 
-  //   if (isEmpty(modules)) {
-  //     console.log('modules not loaded...')
-  //   }
+    if (modules.length === 0) {
+      console.log('modules not loaded...')
+      return;
+    }
 
-  //   config.modules.forEach(module => {
-  //     const classes = module.position.replace('_', ' ')
-  //     const parent = document.getElementsByClassName(classes)
+    modules.forEach(module => {
+      console.log(module);
+      const parentClasses = module.data.position.replace('_', ' ')
+      const parent = document.getElementsByClassName(parentClasses)
 
-  //     if(parent.length > 0) {
-  //       const wrapper = parent[0].getElementsByClassName('container')
-  //       wrapper[0].classList.add(`${module.name}_module`)
-  //     }
-  //   })
-  // }
+      if(parent.length > 0) {
+        const wrapper = parent[0].getElementsByClassName('container')
+        wrapper[0].classList.add('module');
+        module.data.classes.split(' ').forEach(name => {
+          wrapper[0].classList.add(name);
+        })
+        module.getDom()
+          .then(html => {
+            wrapper[0].innerHTML = html;
+          })
+          .then(() => {
+            _updateModuleDom(module);
+          })
+      }
+    })
+  }
+
+  function _updateModuleDom(module){
+    console.log('update', module);
+      const parentClasses = module.data.position.replace('_', ' ')
+      const parent = document.getElementsByClassName(parentClasses)
+
+      if (parent.length > 0) {
+        const wrapper = parent[0].getElementsByClassName(module.name)
+
+        if (!module.data.config.updateInterval){
+          console.error('cannot update without an interval');
+          return
+        }
+
+        setInterval(() => {
+          module.updateDom()
+            .then(html => {
+              wrapper[0].innerHTML = html;
+            })
+        }, module.data.config.updateInterval)
+    }
+  }
 
   // async function _setModuleInitData(){
   //   for (let i = 0; i < modules.names.length; i++) {
@@ -101,16 +136,20 @@ let main = (function(){
   **/
   return{
     init: function(){
-      _loadConfig()
+      _loadConfig();
     },
 
     start: function(){
       moduleLoader.loadModules()
     },
 
-    modulesStarted(){
-      _modulesStarted();
-    }
+    modulesStarted: function(modules){
+      _modulesStarted(modules);
+    },
+
+    // updateDom: function(modules){
+    //   _updateModules(modules)
+    // }
 
     // createModules: function(){
     //   _loadModules()

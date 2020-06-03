@@ -3,239 +3,114 @@
 Module.register('weather', {
 
   _defaults: {
+    updateInterval: 10000,
     location: {
       place: null,
       lat: null,
       lon: null,
     },
-    type: 'current', // current, forecast
-    units: '', //imperial, metric, default Kelvin
+    type: 'current', // current, forecast, default: current
+    forecastDays: 5, // numbers of days to display for forecast
+    units: 'metric', //imperial,  kelvin, default: metric
     appid: '',
   },
 
   _getStyles: function(){
     return [
       'css/weather.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css',
     ]
   },
 
   _getScripts: function(){
     return [
-      'helpers.js'
+      'weatherHelpers.js',
+      dependencies['ejs'],
+      dependencies['moment'],
+      'weatherDay.js',
     ]
   },
 
   _getPlace: function(){
-    let place = `${moduleData.location.city},`;
-    (moduleData.location.state) ? place += `${moduleData.location.state},` : place;
-    place += moduleData.location.country;
-    
+    let place = `${this.data.config.location.city},`;
+    (this.data.config.location.state) ? place += `${this.data.config.location.state},` : place;
+    place += this.data.config.location.country;
+
     return place;
   },
 
-  _getWeatherCurrent: async function (){
-
-    let place = getPlace();
-
-    return fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=${moduleData.appid}`)
-      .then(response => response.json())
-      .then(results => {
-        console.log('results',results)
-
-        const weatherObj = {
-          time: moment.unix(results.dt).format('LT'),
-          location: results.name,
-          icon: results.weather[0].id,
-          description: results.weather[0].description,
-          temp: {
-            current: Math.round(kelvinToFahr(results.main.temp)),
-            high: Math.round(kelvinToFahr(results.main.temp_max)),
-            low: Math.round(kelvinToFahr(results.main.temp_min)),
-            feels_like: Math.round(kelvinToFahr(results.main.feels_like)),
-          },
-          wind: {
-            speed: results.wind.speed,
-            direction: (results.wind.deg)? degToCompass(results.wind.deg) : 'N/A',
-          },
-          humidity: results.main.humidity,
-        }
-
-        return weatherObj;
-      })
-  },
-
-  _createDomCurrent: function(weatherData, configData){
-
-    const moduleLocation = document.getElementsByClassName('container weather_module')
-
-    const wrapper = document.createElement('div')
-      wrapper.id = 'weather_wrapper';
-    const leftWrapper = document.createElement('div')
-      leftWrapper.id = 'weather_leftWrapper';
-    const rightWrapper = document.createElement('div')
-      rightWrapper.id = 'weather_rightWrapper';
-
-    moduleLocation[0].appendChild(wrapper)
-    wrapper.append(leftWrapper, rightWrapper)
-
-    // left wrapper
-    const icon = document.createElement('i');
-      icon.classList.add('wi', `wi-owm-${weatherData.icon}`);
-      icon.id = 'weather_icon';
-      leftWrapper.appendChild(icon);
-
-    // temp
-    const tempWrapper = document.createElement('div')
-      tempWrapper.id = 'weather_tempWrapper';
-
-    const temp = document.createElement('span')
-      temp.id = 'weather_temp'
-      temp.innerHTML = weatherData.temp.current + '&#176;';
-    const tempUnit = document.createElement('span')
-      tempUnit.id = 'weather_unit';
-      switch (configData.units) {
-        case '':
-          tempUnit.innerHTML = 'K'
-          break
-        case 'imperial':
-          tempUnit.innerHTML = 'F'
-          break
-        case 'metric':
-          tempUnit.innerHTML = 'C'
-          break
-      }
-    tempWrapper.append(temp, tempUnit)
-    leftWrapper.appendChild(tempWrapper)
-
-    const feelsLikeWrapper = document.createElement('div')
-      feelsLikeWrapper.id = 'weather_feelsWrapper';
-    const feelsText = document.createElement('span');
-      feelsText.innerHTML = 'Feels like ';
-      feelsText.id = 'weather_feelsText';
-    const feelsTemp = document.createElement('span');
-    feelsTemp.innerHTML = weatherData.temp.feels_like + '&#176;';
-      feelsTemp.id = 'weather_feelsTemp';
-    const feelsUnit = document.createElement('span');
-      switch (configData.units) {
-        case '':
-          feelsUnit.innerHTML = 'K'
-          break
-        case 'imperial':
-          feelsUnit.innerHTML = 'F'
-          break
-        case 'metric':
-          feelsUnit.innerHTML = 'C'
-          break
-      }
-
-    feelsLikeWrapper.append(feelsText, feelsTemp, feelsUnit)
-    leftWrapper.appendChild(feelsLikeWrapper)
-
-    //right wrapper
-
-    // location
-    const locationWrapper = document.createElement('div');
-      locationWrapper.id = 'weather_locationWrapper';
-    const location = document.createElement('div');
-      location.innerHTML = weatherData.location;
-      location.id = 'weather_location';
-
-      locationWrapper.appendChild(location);
-
-    // description
-    const descriptionWrapper = document.createElement('div');
-      descriptionWrapper.id = 'weather_description'
-    const descriptionStaticText = document.createElement('span');
-      descriptionStaticText.innerHTML = 'description: ';
-      descriptionStaticText.id = 'weather_descriptionStatic';
-    const descriptionDynamText = document.createElement('span');
-      descriptionDynamText.innerHTML = weatherData.description;
-      descriptionDynamText.id = 'weather_descriptionDynam';
-
-    descriptionWrapper.append(descriptionStaticText, descriptionDynamText);
-
-    // hi lo tmep
-    const highLowWrapper = document.createElement('div');
-      highLowWrapper.id = 'weather_hiLoWrapper';
-      // high temp
-    const highTempWrapper = document.createElement('span');
-      highTempWrapper.id = 'weather_highTempWrapper';
-    const highTempStaticText = document.createElement('span');
-      highTempStaticText.innerHTML = 'hi: ';
-      highTempStaticText.id = 'weather_highTempStatic';
-    const highTempDynamText = document.createElement('span');
-      highTempDynamText.innerHTML = weatherData.temp.high + '&#176;';
-      highTempDynamText.id = 'weather_highTempDynam';
-
-    highTempWrapper.append(highTempStaticText, highTempDynamText);
-
-      // low temp
-    const lowTempWrapper = document.createElement('span');
-      lowTempWrapper.id = 'weather_lowTempWrapper';
-    const lowTempStaticText = document.createElement('span');
-      lowTempStaticText.innerHTML = 'low: ';
-      lowTempStaticText.id = 'weather_lowTempStatic';
-    const lowTempDynamText = document.createElement('span');
-      lowTempDynamText.innerHTML = weatherData.temp.low + '&#176;';
-      lowTempDynamText.id = 'weather_lowTempDynam';
-
-    lowTempWrapper.append(lowTempStaticText, lowTempDynamText);
-
-    highLowWrapper.append(highTempWrapper, lowTempWrapper);
-
-    // wind
-    const windWrapper = document.createElement('div');
-      windWrapper.id = 'weather_windWrapper';
-
-    const windStaticText = document.createElement('span');
-      windStaticText.innerHTML = 'wind: ';
-      windStaticText.id = 'weather_windStatic';
-    const windDynamText = document.createElement('span');
-      windDynamText.id = 'weather_windDynam';
-    let windUnit;
-      switch (configData.units) {
-        case '':
-          windUnit = 'm/s'
-          break
-        case 'imperial':
-          windUnit = 'mph'
-          break
-        case 'metric':
-          windUnit = 'm/s'
-          break
-      }
-    windDynamText.innerHTML = `${weatherData.wind.speed} ${windUnit}, ${weatherData.wind.direction}`;
-
-    windWrapper.append(windStaticText, windDynamText);
-
-      // humidity
-    const humidityWrapper = document.createElement('div');
-      humidityWrapper.id = 'weather_humidityWrapper';
-
-    const humidityStaticText = document.createElement('span');
-      humidityStaticText.innerHTML = 'humidity: ';
-      humidityStaticText.id = 'weather_humidityStatic';
-    const humidityDynamText = document.createElement('span');
-      humidityDynamText.innerHTML = weatherData.humidity + '%';
-      humidityDynamText.id = 'weather_humidityDynam';
-
-    humidityWrapper.append(humidityStaticText, humidityDynamText);
-
-    rightWrapper.append(locationWrapper, descriptionWrapper, highLowWrapper, windWrapper, humidityWrapper);
-    wrapper.appendChild(rightWrapper);
-  },
-
-  _createDom: function(weatherData, configData){
-    if(configData.type === 'current'){
-      _createDomCurrent(weatherData, configData);
+  _getForcastType: function(){
+    if(this.data.config.type === 'current'){
+      return 'current';
+    }
+    if(this.data.config.type === 'forcast'){
+      return 'forecast/daily';
     }
   },
 
-  getData: async function () {
-    return await _getWeatherCurrent();
+  _getUnitType: function(){
+    const unitType = this.data.config.units.toLowerCase();
+    let units = {}
+    switch(unitType){
+      case 'imperial':
+        units.api = 'I',
+        units.temp = '&#176;F';
+        units.speed = 'mph';
+        break;
+      case '':
+      case 'metric':
+        units.api = 'M',
+        units.temp = '&#176;C';
+        units.speed = 'm/s';
+        break;
+      case 'kelvin':
+        units.api = 'K',
+        units.temp = '&#176;K';
+        units.speed = 'm/s'
+    }
+    return units;
   },
 
-  createDom: function (weatherData) {
-    _createDom(weatherData, moduleData)
+  _getTemplateData: async function(){
+    let place = this._getPlace();
+    let units = this._getUnitType();
+    let weatherData = {
+      units: units,
+      type: this.data.config.type,
+      location: this.data.config.location,
+      current: [],
+      forecast: [],
+    };
+
+    switch(this.data.config.type){
+
+      case 'current':
+        await Promise.all([
+          fetch(`https://api.weatherbit.io/v2.0/current?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+            .then(response => response.json())
+            .then(results => {
+              weatherData.current.push(new WeatherDay(results.data[0]));
+            }),
+          fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          .then(response => response.json())
+          .then(results => {
+            weatherData.forecast.push(new WeatherDay(results.data[0]));
+          })
+        ])
+        console.log('weatherData', weatherData);
+        return { data: weatherData }
+
+      case 'forecast':
+        return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          .then(response => response.json())
+          .then(results => {
+            for(let i = 0; i < this.data.config.forecastDays; i++){
+              weatherData.forecast.push(new WeatherDay(results.data[i]));
+            }
+            console.log('weatherData', weatherData);
+            return { data: weatherData };
+        })
+    }
   },
+
 })

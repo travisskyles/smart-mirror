@@ -21,7 +21,7 @@ const moduleLoader = (function(){
       const loadNext = function(){
         if(modules.length > 0){
           let nextModule = modules[0];
-          _loadModule(nextModule)
+         _loadModule(nextModule)
             .then(() => {
               modules = modules.slice(1);
               loadNext();
@@ -49,13 +49,17 @@ const moduleLoader = (function(){
       let path = `${module.path}/${module.fileName}`;
 
       if (!loadedModules.includes(path)) {
-        resolve(_loadFile(path)
+        _loadFile(path)
           .then(() => {
-            _createModule(module);
-            loadedModules.push(path);
-          }))
+            _createModule(module)
+              .then(() => {
+                loadedModules.push(path);
+                resolve();
+              })
+          })
       } else {
-        resolve(_createModule(module));
+        _createModule(module)
+          .then(() => resolve());
       }
     })
 
@@ -71,12 +75,16 @@ const moduleLoader = (function(){
    * @returns if unable to create new Module instance
    */
   const _createModule = function(module){
-    const moduleInstance = Module.create(module.name);
-    if (moduleInstance) {
-      _loadModuleFiles(module, moduleInstance);
-    } else {
-      return;
-    }
+    return new Promise((resolve, reject) => {
+      const moduleInstance = Module.create(module.name);
+      if (moduleInstance) {
+        _loadModuleFiles(module, moduleInstance)
+          .then(() => resolve());
+      } else {
+        resolve();
+      }
+    })
+
   }
 
   /**
@@ -88,12 +96,19 @@ const moduleLoader = (function(){
    * @param {object} moduleObject module class instance
    */
   const _loadModuleFiles = function(moduleConfigData, moduleObject){
-    console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
-    moduleObject.setData(moduleConfigData);
-
-    moduleObject.loadScripts();
-    moduleObject.loadStyles();
-    modules.push(moduleObject);
+    return new Promise((resolve, reject) => {
+      console.log(`Loading additional files for: ${moduleConfigData.name} module...`);
+      moduleObject.setConfigData(moduleConfigData);
+      moduleObject.loadScripts()
+        .then(() => {
+          console.log('got here');
+          moduleObject.loadStyles()
+            .then(() => {
+              modules.push(moduleObject);
+              resolve();
+            })
+        })
+    })
   }
 
   /**
@@ -105,33 +120,55 @@ const moduleLoader = (function(){
    */
   const _loadFile = function(filePath){
     return new Promise((resolve, reject) => {
-      const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();;
+      const fileType = filePath.slice(filePath.lastIndexOf('.') + 1).toLowerCase();
+      const name = filePath.slice(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'));
+      let scriptArray;
+      let script;
 
       switch(fileType){
 
         case 'js':
-          const scriptArray = Array.from(document.getElementsByTagName('script'));
-          const script = document.createElement('script');
+          scriptArray = Array.from(document.getElementsByTagName('script'));
+          script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = filePath;
-          script.onload = () => resolve();
+          script.onload = () => {
+            console.log(`${name}.${fileType} loaded`)
+            resolve();
+          }
           script.onerror = () => {
             reject(console.error("Error on loading script:", filePath));
           }
-          document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
+          document.getElementsByTagName('body')[0].appendChild(script);
           break;
 
         case 'css':
           const link = document.createElement('link');
-          link.ref = 'stylesheet';
+          link.rel = 'stylesheet';
           link.type = 'text/css'
           link.href = filePath;
-          link.onload = () => resolve(link);
+          link.onload = () => {
+            console.log(`${name}.${fileType} loaded`)
+            resolve();
+          }
           link.onerror = () => {
             reject(console.error("Error on loading style:", filePath));
           }
           document.getElementsByTagName('head')[0].appendChild(link)
           break
+
+        // case 'tpscript':
+        //   filePath = filePath.slice(0, filePath.lastIndexOf('.'));
+        //   scriptArray = Array.from(document.getElementsByTagName('script'));
+        //   script = document.createElement('script');
+        //   script.type = 'text/javascript';
+        //   script.src = filePath;
+        //   script.onload = () => resolve(script);
+        //   script.onerror = () => {
+        //     reject(console.error("Error on loading script:", filePath));
+        //   }
+        //   document.getElementsByTagName('body')[0].insertBefore(script, scriptArray[scriptArray.length - 1]);
+        //   break;
         }
     })
   }
@@ -144,6 +181,7 @@ const moduleLoader = (function(){
   * @returns {arr} returns an array of modules in config file
   */
   const _getModulesFromConfig = function(){
+    console.log(config);
     return config.modules;
   }
 
@@ -158,6 +196,7 @@ const moduleLoader = (function(){
   const _getModuleObjects = function(){
     const modules = _getModulesFromConfig();
     const moduleObjects = [];
+    console.log(modules, moduleObjects);
 
     modules.forEach((module, index) => {
 
@@ -214,14 +253,20 @@ const moduleLoader = (function(){
      * @param {string} file file path in string format
      */
     loadFile: function(file){
-      if(loadedFiles.includes(file)){
+      if(file.includes('node_modules')){
+        file = file.substring(file.indexOf('node_modules'));
+      }
+      if(file.includes('http')){
+        file = file.substring(file.indexOf('http'));
+      }
+      if (loadedFiles.includes(file)) {
         console.log(`File already loaded: ${file}`);
         return;
       }
-      _loadFile(file)
-        .then(() => {
-          loadedFiles.push(file);
-        })
+
+      const loadedFile = _loadFile(file);
+      loadedFiles.push(file);
+      return loadedFile;
     }
   }
 })()

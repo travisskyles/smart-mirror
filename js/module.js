@@ -29,8 +29,7 @@ const Module = class {
     return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getScripts())
         .then(() => {
-          console.log(`Scripts loaded for ${this.name} module.`);
-          resolve();
+          resolve(console.log(`All scripts loaded for ${this.name} module.`));
         })
     })
   }
@@ -39,28 +38,75 @@ const Module = class {
     return new Promise((resolve, reject) => {
       this.loadModuleDependancies(this._getStyles())
         .then(() => {
-          console.log(`Styles loaded for ${this.name} module.`);
-          resolve();
+          resolve(console.log(`All styles loaded for ${this.name} module.`));
         })
     })
   }
 
-  setData(configData){
+  setConfigData(configData){
     this.data = configData;
     this.name = configData.name;
     this.setConfig(configData.config);
   }
 
   setConfig(moduleConfig){
-    this.config = Object.assign({}, this._defaults, moduleConfig);
+    this.data.config = Object.assign({}, this._defaults, moduleConfig);
   }
 
-  loadModuleDependancies(fileArray){
+  async loadModuleDependancies(fileArray){
+    const promiseArray = [];
+
+    for(const file of fileArray) {
+      console.log(file + ' loading...');
+      promiseArray.push(moduleLoader.loadFile(`${this.data.path}/${file}`));
+    }
+
+    await Promise.allSettled(promiseArray);
+    return;
+  }
+
+  // get template data and template and render the template
+  getDom(){
+    return new Promise(async (resolve, reject) => {
+      this.data.templateString = await this._getTemplateString();
+      this.data.templateData =  await this._getTemplateData();
+      console.log(this.data.templateData);
+      let html = ejs.render(this.data.templateString, this.data.templateData)
+      resolve(html);
+    })
+  }
+  // get template string
+  _getTemplateString(){
     return new Promise((resolve, reject) => {
-      fileArray.forEach(file => {
-        moduleLoader.loadFile(`${this.data.path}/${file}`);
-      })
-      resolve();
+      fetch(`/modules/${this.name}/${this.name}.ejs`)
+        .then(response => {
+          resolve(response.text());
+        })
+        .catch(e => {
+          reject(() => {
+            console.error(e);
+            console.log(`No .ejs file found for ${this.name} module`)
+          });
+        })
+    })
+  }
+  // get data for ejs module
+  _getTemplateData(){
+    return {};
+  }
+
+  async updateDom(){
+    return new Promise(async (resolve, reject) => {
+      let templateData = await this._getTemplateData();
+      console.log('update', templateData);
+      if (!templateData) {
+        console.error(`Error updating ${this.name} module data`);
+      } else {
+        this.data.templateData = templateData;
+        let html = ejs.render(this.data.templateString, this.data.templateData)
+
+        resolve(html);
+      }
     })
   }
 
@@ -75,6 +121,7 @@ const Module = class {
     })
     return module;
   }
+
 }
 
 Module.definitions = {};
