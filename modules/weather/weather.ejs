@@ -1,19 +1,18 @@
 
   <div id='weather_wrapper'>
 
-    <% data.days.forEach(day => { %> 
     <% if(data.type === 'current'){ %>
       
     <div id='weather_leftWrapper'>
-      <i id='weather_icon' class="wi wi-owm-<%= day.icon %>"></i>
+      <i id='weather_icon' class="wi wi-owm-<%= data.current[0].icon %>"></i>
       <div id="weather_tempWrapper">
         <p id="weather_temp">
-          <%= day.temp %><%- data.units.temp %>
+          <%= data.current[0].temp %><%- data.units.temp %>
         </p>
       </div>
       <div id="weather_feelsWrapper">
         <p id="weather_feelsText">
-          Feels like: <%= day.feelsLike%><%- data.units.temp %>
+          Feels like: <%= data.current[0].feelsLike%><%- data.units.temp %>
         </p>
       </div>
     </div>
@@ -25,30 +24,58 @@
       </div>
       <div id="weather_description">
         <p id="weather_descriptionText">
-          Description: <%= day.description %>
+          Description: <%= data.current[0].description %>
         </p>
       </div>
       <div id="weather_highTempWrapper">
         <p id="weather_highTempText">
-          Hi: <%= day.highTemp%><%- data.units.temp %>
+          Hi: <%= data.forecast[0].highTemp%><%- data.units.temp %>
         </p>
       </div>
       <div id="weather_lowTempWrapper">
         <p id="weather_lowTempText">
-          Lo: <%= day.lowTemp%><%- data.units.temp %>
+          Lo: <%= data.forecast[0].lowTemp%><%- data.units.temp %>
         </p>
       </div>
       <div id="weather_windWrapper">
         <p id="weather_windText">
-          Wind: <%= day.windSpeed + ' ' + data.units.speed + ', ' + day.windDirection %>
+          Wind: <%= data.current[0].windSpeed + ' ' + data.units.speed + ', ' + data.current[0].windDirection %>
         </p>
       </div>
       <div id="weather_humidityWrapper">
         <p id="weather_humidityText">
-          Humidity: <%= day.humidity %>%
+          Humidity: <%= data.current[0].humidity %>%
         </p>
       </div>
     </div>
     <% } %>
-    <% }) %> 
+    <% if(data.type === 'forecast'){ %>
+      <% data.forecast.forEach(day => { %>
+        <div id="forecast_weekWrapper">
+          <div id="forecast_dayWrapper">
+            <div id="forecast_dayTextWrapper">
+              <p id="forecast_dayText">
+                <%= day.day %>
+              </p>
+            </div>
+            <i id='weather_icon' class="wi wi-owm-<%= day.icon %>"></i>
+            <div id="forecast_descriptionWrapper">
+              <p id="forecast_descriptionText">
+                <%= day.description %>
+              </p>
+            </div>
+            <div id="forecast_highWrapper">
+              <p id="forecast_highText">
+                <%= day.highTemp %>
+              </p>
+            </div>
+            <div id="forecast_lowWrapper">
+              <p id="forecast_lowText">
+                <%= day.lowTemp %>
+              </p>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      <% } %>
   </div>

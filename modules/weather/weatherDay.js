@@ -1,18 +1,21 @@
 'use strict';
 
 var WeatherDay = class {
-  constructor(weatherObj, units){
-    this.temp = Math.round(this.convertTemp(weatherObj.main.temp, units));
-    this.pressure = weatherObj.main.pressure;
-    this.humidity = weatherObj.main.humidity;
-    this.highTemp = Math.round(this.convertTemp(weatherObj.main.temp_max, units));
-    this.lowTemp = Math.round(this.convertTemp(weatherObj.main.temp_min, units));
-    this.feelsLike = Math.round(this.convertTemp(weatherObj.main.feels_like, units));
-    this.windSpeed = Math.round(this.convertSpeed(weatherObj.wind.speed, units)) || 'N/A';
-    this.windDirection = weatherHelper.degToCompass(weatherObj.wind.deg) || 'N/A';
-    this.icon = weatherObj.weather[0].id;
-    this.description = weatherObj.weather[0].description;
-    this.time = moment.unix(weatherObj.dt).format('LT');
+  constructor(forecastData){
+    this.temp = Math.round(forecastData.temp);
+    this.pressure = forecastData.pres;
+    this.humidity = forecastData.rh;
+    this.percentPrecip = forecastData.pop;
+    this.highTemp = Math.round(forecastData.high_temp);
+    this.lowTemp = Math.round(forecastData.low_temp);
+    this.feelsLike = Math.round(forecastData.app_temp);
+    this.windSpeed = Math.round(forecastData.wind_spd) || 'N/A';
+    this.windDirection = forecastData.wind_cdir || 'N/A';
+    this.icon = forecastData.weather.code;
+    this.description = forecastData.weather.description;
+    this.time = moment.unix(forecastData.ts).format('LT');
+    this.date = forecastData.valid_date;
+    this.day = moment(this.date).format('dddd').slice(0, 3);
   }
 
   convertTemp(temp, units){
@@ -33,5 +36,6 @@ var WeatherDay = class {
     if(units === 'imperial'){
       return speed * 2.237;
     }
+    return speed;
   }
 }

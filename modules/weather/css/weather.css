@@ -58,6 +58,45 @@ p {
   /* justify-self: flex-end; */
 }
 
-#weather_lowTempWrapper {
-  /* margin-left: 15px; */
+/* **************** */
+/* Forecast display */
+/* **************** */
+
+#forecast_weekWrapper {
+  display: flex;
+  flex-direction: row;
 }
+
+#forecast_dayWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 85px;
+  margin: 0 5px 0 5px;
+  padding: 5px;
+  /* border: 1px solid white; */
+}
+
+/* #forecast_dayTextWrapper {
+  height:
+} */
+
+#forecast_descriptionWrapper {
+  text-align: center;
+  height: 30px;
+  margin-top: 10px;
+}
+
+#forecast_dayText {
+  font-size: 25px;
+}
+
+#forecast_highText {
+  font-size: 35px;
+}
+
+#forecast_highText {
+  font-size: 25px;
+}
+

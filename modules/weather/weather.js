@@ -8,8 +8,9 @@ Module.register('weather', {
       lat: null,
       lon: null,
     },
-    type: 'current', // current, forecast
-    units: 'kelvin', //imperial, metric, default Kelvin
+    type: 'current', // current, forecast, default: current
+    forecastDays: 5, // numbers of days to display for forecast
+    units: 'metric', //imperial,  kelvin, default: metric
     appid: '',
   },
 
@@ -39,9 +40,10 @@ Module.register('weather', {
 
   _getForcastType: function(){
     if(this.config.type === 'current'){
-      return 'weather';
-    }else {
-      return this.config.type;
+      return 'current';
+    }
+    if(this.config.type === 'forcast'){
+      return 'forecast/daily';
     }
   },
 
@@ -50,15 +52,18 @@ Module.register('weather', {
     let units = {}
     switch(unitType){
       case 'imperial':
+        units.api = 'I',
         units.temp = '&#176;F';
         units.speed = 'mph';
         break;
+      case '':
       case 'metric':
+        units.api = 'M',
         units.temp = '&#176;C';
         units.speed = 'm/s';
         break;
-      case '':
       case 'kelvin':
+        units.api = 'K',
         units.temp = '&#176;K';
         units.speed = 'm/s'
     }
@@ -67,31 +72,42 @@ Module.register('weather', {
 
   _getTemplateData: async function(){
     let place = this._getPlace();
-    let type = this._getForcastType();
     let units = this._getUnitType();
+    let weatherData = {
+      units: units,
+      type: this.config.type,
+      location: this.config.location,
+      current: [],
+      forecast: [],
+    };
 
-    return fetch(`https://api.openweathermap.org/data/2.5/${type}?q=${place}&appid=${this.config.appid}`)
-      .then(response => response.json())
-      .then(results => {
-        let weatherData = {
-          units: units,
-          type: this.config.type,
-          location: this.config.location,
-          days: [],
-        };
-        switch(this.config.type){
-          case 'current':
-            weatherData.days.push(new WeatherDay(results, this.config.units));
-            break;
-          case 'forcast':
-            results.list.forEach(day => {
-              weatherData.days.push(new WeatherDay(day, this.config.units));
-            })
-            break;
-        }
-        console.log('weatherData', weatherData);
-        return {data: weatherData};
-      })
+    switch(this.config.type){
+
+      case 'current':
+        await Promise.all([
+          fetch(`https://api.weatherbit.io/v2.0/current?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+            .then(response => response.json())
+            .then(results => {
+              weatherData.current.push(new WeatherDay(results.data[0]));
+            }),
+          fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          .then(response => response.json())
+          .then(results => {
+            weatherData.forecast.push(new WeatherDay(results.data[0]));
+          })
+        ])
+        return { data: weatherData }
+
+      case 'forecast':
+        return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          .then(response => response.json())
+          .then(results => {
+            for(let i = 0; i < this.config.forecastDays; i++){
+              weatherData.forecast.push(new WeatherDay(results.data[i]));
+            }
+            return { data: weatherData };
+        })
+    }
   },
 
 })

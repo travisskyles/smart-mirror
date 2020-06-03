@@ -71,7 +71,7 @@ const Module = class {
       const div = document.createElement('div');
       const templateString = await this._getTemplateString();
       const templateData =  await this._getTemplateData();
-
+      console.log(templateData);
       let html = ejs.render(templateString, templateData)
       div.innerHTML = html;
  
