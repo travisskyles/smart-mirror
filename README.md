@@ -1,5 +1,5 @@
 # smart-mirror
-A smart mirror display application created using node.js for use with a raspberry pi.
+A modular smart mirror display application created using node.js for use with a raspberry pi.
 
 ## Install
 - clone repository
