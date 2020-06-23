@@ -3,19 +3,24 @@ var sample_config = {
   modules: [
     {
       name: 'weather',
+      disabled: 'false',
       position: 'top_right',
       config: {
         location: {
-          place: 'Beaverton, OR',
-          lat: '45.4889',
-          lon: '-122.8014',
-          // lat: null,
-          // lon: null,
+          city: 'Beaverton',
+          state: 'OR',
+          country: 'US',
         },
         type: 'current', // current, forecast
         units: 'imperial', //imperial, metric
-        appid: 'sample_',
+        appid: 'api_key_here', // open weather api key
       },
+    },
+    {
+      name: 'helloWorld',
+      disabled: 'false',
+      position: 'middle_third',
+      config: {},
     },
   ],
 }
