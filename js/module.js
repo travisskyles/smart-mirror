@@ -55,7 +55,7 @@ const Module = class {
 
   async loadModuleDependancies(fileArray){
     const promiseArray = [];
-
+    console.log('FILEARRAY', fileArray)
     for(const file of fileArray) {
       console.log(file + ' loading...');
       promiseArray.push(moduleLoader.loadFile(`${this.data.path}/${file}`));

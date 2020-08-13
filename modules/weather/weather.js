@@ -3,7 +3,7 @@
 Module.register('weather', {
 
   _defaults: {
-    updateInterval: 10000,
+    updateInterval: 1000 * 3600,
     location: {
       place: null,
       lat: null,
