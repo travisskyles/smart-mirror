@@ -1,11 +1,11 @@
 # smart-mirror
-A smart mirror display application created using node.js for use with a raspberry pi.
+A modular smart mirror display application created using node.js for use with a raspberry pi.
 
 ## Install
 - clone repository
 - open directory and npm install
 - copy the config_sample.js into the config folder as 'config.js'
-- changed settings and add api keys as necessary
+- change settings and add api keys as necessary
 - npm start
 
 ## Current Modules
