@@ -1,0 +1,14 @@
+<div id='news_rss_wrapper'>
+  <% if(data.type === 'scrolling'){ %>
+  <div class='ticker-wrap'>
+    <div class='ticker'>
+    
+      <% data.data.forEach((item, idx) => { %>
+      <div class='news_rss_ticker_item'><%= item.title %></div>
+    
+      <% }) %>
+    </div>
+  </div>
+
+  <% } %>
+</div>
