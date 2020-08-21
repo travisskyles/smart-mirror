@@ -1,36 +1,33 @@
 'use strict';
 
-const defaults = {
+
+let config = {
   port: 3000,
   modules: [
-    // {
-    //   module: 'weather',
-    //   disabled: 'false',
-    //   position: 'top_right',
-    //   config: {
-    //     location: {
-    //       city: '', // ex. Los Angeles
-    //       state: '', // ex. CA
-    //       country: '', // ex. US
-    //     },
-    //     type: 'current', // current, forecast,
-    //     units: 'imperial', //imperial, metric, default: kelvin
-    //     appid: null
-    //   }
-    // },
-    // {
-    //   name: 'messages',
-    //   disabled: 'false',
-    //   position: 'middle_third',
-    //   config: {},
-    // },
+    {
+      name: 'news_rss',
+      disabled: 'false',
+      position: 'bottom_middle',
+      config: {
+        url: 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+        type: 'scrolling', // scrolling or descriptive
+      }
+    },
+    {
+      name: 'messages',
+      disabled: 'false',
+      position: 'upper_third',
+      config: {
+        appId: '',
+      },
+    },
     {
       name: 'time_date',
       disabled: 'false',
-      position: 'middle_third',
+      position: 'top_left',
       config: {},
     },
-  ]
+  ],
 }
 
-module.exports = defaults;
+// module.exports = config;
