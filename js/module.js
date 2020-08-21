@@ -116,6 +116,7 @@ const Module = class {
 
   static create(name){
     const module = new Module;
+    console.log(Module.definitions);
     Object.keys(Module.definitions[name]).forEach(key => {
       module[key] = Module.definitions[name][key];
     })

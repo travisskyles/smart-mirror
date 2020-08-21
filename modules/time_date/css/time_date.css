@@ -1,0 +1,14 @@
+#time_date_wrapper {
+
+}
+
+#time_date_time {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+#time_date_date {
+  font-size: .8em;
+  font-style: italic;
+  text-align: end;
+}

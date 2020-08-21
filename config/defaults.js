@@ -25,7 +25,7 @@ const defaults = {
     //   config: {},
     // },
     {
-      name: 'helloWorld',
+      name: 'time_date',
       disabled: 'false',
       position: 'middle_third',
       config: {},
