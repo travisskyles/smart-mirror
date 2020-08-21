@@ -55,7 +55,7 @@ const Module = class {
 
   async loadModuleDependancies(fileArray){
     const promiseArray = [];
-    console.log('FILEARRAY', fileArray)
+
     for(const file of fileArray) {
       console.log(file + ' loading...');
       promiseArray.push(moduleLoader.loadFile(`${this.data.path}/${file}`));
@@ -70,7 +70,7 @@ const Module = class {
     return new Promise(async (resolve, reject) => {
       this.data.templateString = await this._getTemplateString();
       this.data.templateData =  await this._getTemplateData();
-      console.log(this.data.templateData);
+
       let html = ejs.render(this.data.templateString, this.data.templateData)
       resolve(html);
     })
@@ -98,7 +98,7 @@ const Module = class {
   async updateDom(){
     return new Promise(async (resolve, reject) => {
       let templateData = await this._getTemplateData();
-      console.log('update', templateData);
+
       if (!templateData) {
         console.error(`Error updating ${this.name} module data`);
       } else {
@@ -116,7 +116,6 @@ const Module = class {
 
   static create(name){
     const module = new Module;
-    console.log(Module.definitions);
     Object.keys(Module.definitions[name]).forEach(key => {
       module[key] = Module.definitions[name][key];
     })

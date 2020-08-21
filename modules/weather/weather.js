@@ -97,7 +97,6 @@ Module.register('weather', {
             weatherData.forecast.push(new WeatherDay(results.data[0]));
           })
         ])
-        console.log('weatherData', weatherData);
         return { data: weatherData }
 
       case 'forecast':
@@ -107,7 +106,6 @@ Module.register('weather', {
             for(let i = 0; i < this.data.config.forecastDays; i++){
               weatherData.forecast.push(new WeatherDay(results.data[i]));
             }
-            console.log('weatherData', weatherData);
             return { data: weatherData };
         })
     }

@@ -29,7 +29,7 @@ Module.register('messages', {
 
   _getStyles: function () {
     return [
-
+      'css/messages.css',
     ]
   },
 

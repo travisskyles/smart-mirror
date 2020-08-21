@@ -66,7 +66,6 @@ let main = (function(){
     }
 
     modules.forEach(module => {
-      console.log(module);
       const parentClasses = module.data.position.replace('_', ' ')
       const parent = document.getElementsByClassName(parentClasses)
 
@@ -88,7 +87,6 @@ let main = (function(){
   }
 
   function _updateModuleDom(module){
-    console.log('update', module);
       const parentClasses = module.data.position.replace('_', ' ')
       const parent = document.getElementsByClassName(parentClasses)
 

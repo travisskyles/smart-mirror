@@ -1,0 +1,14 @@
+#messages_time {
+  font-size: 1.5em;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+#messages_quote {
+  font-size: 1em;
+  font-style: italic;
+}
+
+#messages_author {
+  font-size: .75em;
+}
