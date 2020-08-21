@@ -1,7 +1,6 @@
 'use strict';
 
-
-let config = {
+let defaults = {
   port: 3000,
   modules: [
     {
@@ -30,4 +29,4 @@ let config = {
   ],
 }
 
-// module.exports = config;
+module.exports = defaults;

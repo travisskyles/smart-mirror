@@ -52,14 +52,16 @@ Module.register('messages', {
   //   })
   //     .then(response => response.json())
   //     .then(data => {
+        
+
   //       data.results.forEach(item => {
-  //         if(!item.author) item.author = 'unknown';
+  //         // if(!item.author) item.author = 'unknown';
   //         messageData.messages.quotes.push({
-  //           author: item.author,
-  //           quote: item.quote
+  //           author: item.author ? item.quote.slice(item.quote.lastIndexOf('.') + 2) : 'unknown',
+  //           quote: item.quote.slice(0, item.quote.lastIndexOf('.') + 1)
   //         })
   //       })
-  //       return { data: messageData.messages };
+  //       console.log(JSON.stringify(messageData.messages.quotes));
   //     })
   // }
 

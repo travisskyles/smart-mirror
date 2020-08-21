@@ -1,6 +1,12 @@
 # smart-mirror
 A modular smart mirror display application created using node.js for use with a raspberry pi.
 
+This project is an effort to create the informational display portion of a smart mirror application. It consists of a small express based server to display the page locally, one index.html page, and javascript module loaders to load all the remaining necessary packages, stylesheets, and js module files into the html page to be displayed.
+
+Below is a preview of the current build as well as installation instructions:
+
+![example display](./imgs/app_example.png)
+
 ## Install
 - clone repository
 - open directory and npm install
