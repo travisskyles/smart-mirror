@@ -24,7 +24,8 @@ Module.register('messages', {
         'Buenas Noches',
       ],
     },
-    appId: '',
+    numberOfMessages: 500,
+    category: ['famous'],
   },
 
   _getStyles: function () {
@@ -45,17 +46,22 @@ Module.register('messages', {
   //   const messageData = {
   //     messages: this.data.config.messages,
   //   }
-  //   return fetch(`https://api.paperquotes.com/apiv1/quotes/?limit=500&tags=famous`, {
+
+  //   const fetchData = { 
+  //     limit: this.data.config.numberOfMessages,
+  //     tags: this.data.config.category,
+  //   }
+
+  //   return fetch('http://127.0.0.1:3001/messages', {
+  //       method: 'POST',
   //     headers: {
-  //       'Authorization': `Token ${this.data.config.appId}`
-  //     }
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(fetchData),
   //   })
   //     .then(response => response.json())
   //     .then(data => {
-        
-
   //       data.results.forEach(item => {
-  //         // if(!item.author) item.author = 'unknown';
   //         messageData.messages.quotes.push({
   //           author: item.author ? item.quote.slice(item.quote.lastIndexOf('.') + 2) : 'unknown',
   //           quote: item.quote.slice(0, item.quote.lastIndexOf('.') + 1)

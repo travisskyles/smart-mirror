@@ -69,19 +69,20 @@ class Server {
     });
 
     this.server.post('/messages', (req, res) => {
-    fetch(`https://api.paperquotes.com/apiv1/quotes/?limit=500&tags=famous`, {
-      headers: {
-        'Authorization': `Token ${process.env.PAPER_QUOTES_KEY}`,
-        'Content-Type': 'application/json',
-      }
+      const {limit, tags} = req.body;
+      tags = tags.join();
+      fetch(`https://api.paperquotes.com/apiv1/quotes/?limit=${limit}&tags=${tags}`, {
+        headers: {
+          'Authorization': `Token ${process.env.PAPER_QUOTES_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          res.status(200).send(data);
+        })
     })
-      .then(response => response.json())
-      .then(data => {
-        res.status(200).send(data);
-    })
-
   }
-
   start(){
     this._use();
     this._get();
