@@ -1,117 +1,106 @@
 'use strict';
 
 Module.register('messages', {
-  _defaults: {
-    updateInterval: 1000 * 60,
-    apiTags: ['philosophy', 'inpirational', 'knowledge', 'reality', 'wisdom', 'history', 'famous'],
-    messages: {
-      quotes: [],
-      morning: [
-        'Good Morning',
-        'Guten Morgen',
-        'Buenos días',
+	_defaults: {
+		updateInterval: 1000 * 60,
+		apiTags: [
+			'philosophy',
+			'inpirational',
+			'knowledge',
+			'reality',
+			'wisdom',
+			'history',
+			'famous',
+		],
+		messages: {
+			quotes: [],
+			morning: ['Good Morning', 'Guten Morgen', 'Buenos días'],
+			afternoon: ['Guten Tag', 'Buenas Tardes', 'Good Afternoon'],
+			evening: ['Good Evening', 'Gute Nacht', 'Buenas Noches'],
+		},
+		numberOfMessages: 500,
+		category: ['famous'],
+	},
 
-      ],
-      afternoon: [
-        'Guten Tag',
-        'Buenas Tardes',
-        'Good Afternoon',
+	_getStyles: function () {
+		return ['css/messages.css'];
+	},
 
-      ],
-      evening: [
-        'Good Evening',
-        'Gute Nacht',
-        'Buenas Noches',
-      ],
-    },
-    numberOfMessages: 500,
-    category: ['famous'],
-  },
+	_getScripts: function () {
+		return [dependencies['ejs'], 'messagesJson.js'];
+	},
 
-  _getStyles: function () {
-    return [
-      'css/messages.css',
-    ]
-  },
+	// COMMENTED OUT TO PREVENT OVERUSE OF API CALLS
+	// _getTemplateData: async function(){
+	//   const messageData = {
+	//     messages: this.data.config.messages,
+	//   }
 
-  _getScripts: function () {
-    return [
-      dependencies['ejs'],
-      'messagesJson.js',
-    ]
-  },
+	//   const fetchData = {
+	//     limit: this.data.config.numberOfMessages,
+	//     tags: this.data.config.category,
+	//   }
 
-  // COMMENTED OUT TO PREVENT OVERUSE OF API CALLS
-  // _getTemplateData: async function(){
-  //   const messageData = {
-  //     messages: this.data.config.messages,
-  //   }
+	//   return fetch(`${window.location.href}messages`, {
+	//       method: 'POST',
+	//     headers: {
+	//       'Content-Type': 'application/json',
+	//     },
+	//     body: JSON.stringify(fetchData),
+	//   })
+	//     .then(response => response.json())
+	//     .then(data => {
+	//       data.results.forEach(item => {
+	//         messageData.messages.quotes.push({
+	//           author: item.author ? item.quote.slice(item.quote.lastIndexOf('.') + 2) : 'unknown',
+	//           quote: item.quote.slice(0, item.quote.lastIndexOf('.') + 1)
+	//         })
+	//       })
+	//       console.log(JSON.stringify(messageData.messages.quotes));
+	//     })
+	// }
 
-  //   const fetchData = { 
-  //     limit: this.data.config.numberOfMessages,
-  //     tags: this.data.config.category,
-  //   }
+	// temporary function to use stored data rather than api calls
+	_getTemplateData: function () {
+		const messages = {
+			quotes: messageJsonData,
+			morning: this.data.config.messages.morning,
+			afternoon: this.data.config.messages.afternoon,
+			evening: this.data.config.messages.evening,
+		};
 
-  //   return fetch('http://127.0.0.1:3001/messages', {
-  //       method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(fetchData),
-  //   })
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       data.results.forEach(item => {
-  //         messageData.messages.quotes.push({
-  //           author: item.author ? item.quote.slice(item.quote.lastIndexOf('.') + 2) : 'unknown',
-  //           quote: item.quote.slice(0, item.quote.lastIndexOf('.') + 1)
-  //         })
-  //       })
-  //       console.log(JSON.stringify(messageData.messages.quotes));
-  //     })
-  // }
+		let currentTime = new Date().toLocaleTimeString('en-GB').slice(0, 2);
+		let quoteMessage = messages.quotes[getIndex(messages.quotes.length - 1)];
+		let timeMessage = setTimeMsg(currentTime);
 
-  // temporary function to use stored data rather than api calls
-  _getTemplateData: function(){
-    const messages = {
-      quotes: messageJsonData,
-      morning: this.data.config.messages.morning,
-      afternoon: this.data.config.messages.afternoon,
-      evening: this.data.config.messages.evening,
-    }
+		function getIndex(maximum) {
+			return Math.floor(Math.random() * maximum);
+		}
 
-    let currentTime = new Date().toLocaleTimeString('en-GB').slice(0, 2);;
-    let quoteMessage = messages.quotes[getIndex(messages.quotes.length - 1)];
-    let timeMessage = setTimeMsg(currentTime);
+		setInterval(() => {
+			currentTime = new Date().toLocaleTimeString('en-GB').slice(0, 2);
+			timeMessage = setTimeMsg(currentTime);
+		}, 1000 * 3600);
 
-    function getIndex(maximum) {
-      return Math.floor(Math.random() * (maximum))
-    }
+		setInterval(() => {
+			let index = getIndex(messages.quotes.length - 1);
+			quoteMessage = messages.quotes[index];
+		}, 1000 * 60);
 
-    setInterval(() => {
-      currentTime = new Date().toLocaleTimeString('en-GB').slice(0, 2);
-      timeMessage = setTimeMsg(currentTime);
-    }, 1000 * 3600)
-
-    setInterval(() => {
-      let index = getIndex(messages.quotes.length - 1);
-      quoteMessage = messages.quotes[index]
-    }, 1000 * 60)
-
-    function setTimeMsg(hour) {
-      if (hour >= 0 && hour < 12) {
-        return messages.morning[getIndex(messages.morning.length - 1)]
-      } else if (hour >= 12 && hour < 17) {
-        return messages.afternoon[getIndex(messages.afternoon.length - 1)]
-      } else if (hour >= 17 && hour < 24) {
-        return messages.evening[getIndex(messages.evening.length - 1)]
-      }
-    }
-    return {
-      data: {
-        quoteMessage: quoteMessage,
-        timeMessage: timeMessage,
-      }
-    };
-  }
-})
+		function setTimeMsg(hour) {
+			if (hour >= 0 && hour < 12) {
+				return messages.morning[getIndex(messages.morning.length - 1)];
+			} else if (hour >= 12 && hour < 17) {
+				return messages.afternoon[getIndex(messages.afternoon.length - 1)];
+			} else if (hour >= 17 && hour < 24) {
+				return messages.evening[getIndex(messages.evening.length - 1)];
+			}
+		}
+		return {
+			data: {
+				quoteMessage: quoteMessage,
+				timeMessage: timeMessage,
+			},
+		};
+	},
+});

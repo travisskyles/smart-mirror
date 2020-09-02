@@ -87,7 +87,7 @@ Module.register('weather', {
 
       case 'current':
         await Promise.all([
-					fetch(`http://127.0.0.1:3001/weather/current`, {
+					fetch(`${window.location.href}weather/current`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(fetchData),
@@ -96,7 +96,7 @@ Module.register('weather', {
 						.then((results) => {
 							weatherData.current.push(new WeatherDay(results.data[0]));
 						}),
-					fetch(`http://127.0.0.1:3001/weather/forecast`, {
+					fetch(`${window.location.href}weather/forecast`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(fetchData),
@@ -109,7 +109,7 @@ Module.register('weather', {
         return { data: weatherData }
 
       case 'forecast':
-        return fetch(`http://127.0.0.1:3001/weather/forecast`, {
+        return fetch(`${window.location.href}weather/forecast`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(fetchData),
