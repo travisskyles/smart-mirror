@@ -109,14 +109,18 @@ Module.register('weather', {
         return { data: weatherData }
 
       case 'forecast':
-        return fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
-          .then(response => response.json())
-          .then(results => {
-            for(let i = 0; i < this.data.config.forecastDays; i++){
-              weatherData.forecast.push(new WeatherDay(results.data[i]));
-            }
-            return { data: weatherData };
-        })
+        return fetch(`http://127.0.0.1:3001/weather/forecast`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(fetchData),
+				})
+					.then((response) => response.json())
+					.then((results) => {
+						for (let i = 0; i < this.data.config.forecastDays; i++) {
+							weatherData.forecast.push(new WeatherDay(results.data[i]));
+						}
+						return { data: weatherData };
+					});
     }
   },
 
