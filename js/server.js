@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -7,6 +8,7 @@ const open = require('open');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
 
 class Server {
 
@@ -49,11 +51,27 @@ class Server {
   }
 
   _post(){
-    this.server.post('/weather', (req, res) => {
-      // const {units, place} = req.body;
-      console.log(req.body);
-      res.send('weather hello');
-    })
+    this.server.post('/weather/current', (req, res) => {
+      const {units, place} = req.body;
+      fetch(
+				`https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHERBIT_KEY}&units=${units.api}&city=${place}`
+      )
+        .then(response => response.json())
+        .then(data => {
+          res.status(200).send(data)
+        })
+    });
+
+    this.server.post('/weather/forecast', (req, res) => {
+      const { units, place } = req.body;
+      fetch(
+        `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHERBIT_KEY}&units=${units}&city=${place}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          res.status(200).send(data);
+        });
+    });
   }
 
   start(){
