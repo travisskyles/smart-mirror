@@ -88,7 +88,7 @@ class Server {
     this._get();
     this._post();
     this.server.listen(this.port, () => console.log(`server up on ${this.port}`));
-    open(`http://localhost:${this.port}/`);
+    // open(`http://localhost:${this.port}/`);
   };
 }
 
