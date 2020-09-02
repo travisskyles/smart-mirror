@@ -36,15 +36,8 @@ class Server {
       try{
         fs.existsSync(global.root_path + 'config/config.js');
         let configFile = 'config/config.js';
-        if(configFile){
-          html = html.replace('#CONFIG', configFile);
-          res.send(html);
-        } else {
-          fs.existsSync(global.root_path + 'config/defaults.js');
-          let configFile = 'config/defaults.js';
-          html = html.replace('#CONFIG', configFile);
-          res.send(html);
-        }
+        html = html.replace('#CONFIG', configFile);
+        res.send(html);
       }
       catch(e){
         console.error('ERROR! Could not find config file. Please create a config file and try again.' + e);
@@ -97,7 +90,7 @@ class Server {
     this.server.listen(process.env.PORT, () =>
 			console.log(`server up on ${process.env.PORT}`)
 		);
-    // open(`http://localhost:${this.port}/`);
+    open(`http://localhost:${process.env.PORT}/`);
   };
 }
 
