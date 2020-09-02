@@ -81,21 +81,33 @@ Module.register('weather', {
       current: [],
       forecast: [],
     };
-
+    const fetchData = { units: units.api, place: place };
+    console.log(fetchData);
     switch(this.data.config.type){
-
+      
       case 'current':
         await Promise.all([
-          fetch(`https://api.weatherbit.io/v2.0/current?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
-            .then(response => response.json())
-            .then(results => {
-              weatherData.current.push(new WeatherDay(results.data[0]));
-            }),
-          fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
-          .then(response => response.json())
-          .then(results => {
-            weatherData.forecast.push(new WeatherDay(results.data[0]));
+          // fetch(`https://api.weatherbit.io/v2.0/current?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          //   .then(response => response.json())
+          //   .then(results => {
+          //     weatherData.current.push(new WeatherDay(results.data[0]));
+          //   }),
+          // fetch(`https://api.weatherbit.io/v2.0/forecast/daily?key=2f80f1fe90d045cb8d63a25a41176e47&units=${units.api}&city=${place}`)
+          // .then(response => response.json())
+          // .then(results => {
+          //   weatherData.forecast.push(new WeatherDay(results.data[0]));
+          // })
+          
+
+          fetch(`http://127.0.0.1:3001/weather`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(fetchData),
           })
+            .then(results => {
+              return results.text()
+            })
+            .then(data => console.log(data))
         ])
         return { data: weatherData }
 
