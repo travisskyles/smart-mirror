@@ -43,11 +43,6 @@ class Server {
         console.error('ERROR! Could not find config file. Please create a config file and try again.' + e);
       }
     })
-    this.server.get('/weather', (req, res) => {
-      // const {units, place} = req.body;
-      console.log(req.body);
-      res.send('weather hello')
-    })
   }
 
   _post(){
@@ -72,6 +67,19 @@ class Server {
           res.status(200).send(data);
         });
     });
+
+    this.server.post('/messages', (req, res) => {
+    fetch(`https://api.paperquotes.com/apiv1/quotes/?limit=500&tags=famous`, {
+      headers: {
+        'Authorization': `Token ${process.env.PAPER_QUOTES_KEY}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        res.status(200).send(data);
+    })
+
   }
 
   start(){
