@@ -35,7 +35,6 @@ class App {
    */
   start(){
       const config = this._loadConfig();
-      console.log(config);
       const server = new Server(config);
       server.start();
     }
