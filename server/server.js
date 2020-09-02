@@ -94,7 +94,9 @@ class Server {
     this._use();
     this._get();
     this._post();
-    this.server.listen(this.port, () => console.log(`server up on ${this.port}`));
+    this.server.listen(process.env.PORT, () =>
+			console.log(`server up on ${process.env.PORT}`)
+		);
     // open(`http://localhost:${this.port}/`);
   };
 }
